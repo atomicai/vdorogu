@@ -1,21 +1,16 @@
-from vdorogu.inferencer.base_container import Container, match_arcifact_path
-
-from transformers import AutoTokenizer
-from vdorogu.nn_component.model.nlp.bert_dssm import BertDSSM
-
-from vdorogu.dataset.web import pad_sequence
-
+import sys
 from collections import OrderedDict
 from itertools import chain
 
 import numpy as np
-
 import torch
-from torch import nn
 import torch.nn.functional as F
+from torch import nn
+from transformers import AutoTokenizer
 
-import sys
-
+from vdorogu.dataset.web import pad_sequence
+from vdorogu.inferencer.base_container import Container, match_arcifact_path
+from vdorogu.nn_component.model.nlp.bert_dssm import BertDSSM
 
 TEXT_MAXLEN = 20
 WORDS_MAXLEN = 30

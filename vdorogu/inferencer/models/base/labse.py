@@ -1,16 +1,14 @@
-from vdorogu.inferencer.base_container import Container, match_arcifact_path
-
-from transformers import AutoTokenizer
-from vdorogu.nn_component.model.nlp.bert_dssm import BertSentenceEmb
-
-from vdorogu.dataset.web import valid_collate, valid_collate_dssm, sentence_emb_concat
-from vdorogu.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
-
 from collections import OrderedDict
 
 import numpy as np
 import torch
 import torch.nn.functional as F
+from transformers import AutoTokenizer
+
+from vdorogu.dataset.web import sentence_emb_concat, valid_collate, valid_collate_dssm
+from vdorogu.inferencer.base_container import Container, match_arcifact_path
+from vdorogu.nn_component.model.nlp.bert_dssm import BertSentenceEmb
+from vdorogu.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
 
 
 class LaBSEContainer(Container):

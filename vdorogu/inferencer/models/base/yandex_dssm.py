@@ -1,11 +1,11 @@
-from vdorogu.inferencer.base_container import Container, match_arcifact_path
-from vdorogu.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
-
-from vdorogu.pipeline.SOTA.web_rank.yandex_dssm.source.src.utils import EuclideanMatcher
-from vdorogu.pipeline.SOTA.web_rank.yandex_dssm.source.src.qlt_reader import Indexer
+import string
 
 import torch
-import string
+
+from vdorogu.inferencer.base_container import Container, match_arcifact_path
+from vdorogu.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
+from vdorogu.pipeline.SOTA.web_rank.yandex_dssm.source.src.qlt_reader import Indexer
+from vdorogu.pipeline.SOTA.web_rank.yandex_dssm.source.src.utils import EuclideanMatcher
 
 
 class YandexModel(torch.nn.Module):

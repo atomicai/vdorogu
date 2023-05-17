@@ -1,9 +1,9 @@
-from pyspark import SparkContext, SparkConf, SQLContext
-import getpass
 import abc
+import getpass
 import os
 import sys
 
+from pyspark import SparkConf, SparkContext, SQLContext
 
 username = getpass.getuser()
 os.environ['HADOOP_USER_NAME'] = username
@@ -28,8 +28,8 @@ spark = SQLContext(sc)
 
 import pyspark.sql.functions as F
 import pyspark.sql.types as T
-from pyspark.sql.window import Window
 from pyspark.sql import SparkSession
+from pyspark.sql.window import Window
 
 spark = SparkSession.builder.getOrCreate()
 sc = spark.sparkContext

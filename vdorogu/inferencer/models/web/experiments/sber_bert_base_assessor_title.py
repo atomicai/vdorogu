@@ -1,5 +1,5 @@
-from vdorogu.pipeline.inferencer.base_container import match_arcifact_path
 from vdorogu.inferencer.models.base.bert_dssm import SberBertContainer
+from vdorogu.pipeline.inferencer.base_container import match_arcifact_path
 
 
 class Container(SberBertContainer):

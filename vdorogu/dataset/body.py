@@ -1,19 +1,19 @@
-import os
-import re
-import torch
-import unicodedata
+import gc
 import gzip
 import json
+import os
 import pickle
-
 import random
-import gc
+import re
+import unicodedata
 from collections import defaultdict
 from itertools import chain
-from vdorogu.dataset.web import bert_concat, t5_concat
 
 import numpy as np
-from torch.utils.data import Dataset, IterableDataset, Sampler, DataLoader
+import torch
+from torch.utils.data import DataLoader, Dataset, IterableDataset, Sampler
+
+from vdorogu.dataset.web import bert_concat, t5_concat
 from vdorogu.nn_component.model.nlp.parade import get_indexer
 
 

@@ -1,13 +1,12 @@
-import torch
-
-import sys
-
-from collections import defaultdict
 import os.path as osp
+import sys
+from collections import defaultdict
+
+import torch
 
 
 def remove_prefix(prefix, state_dict):
-    return {k[len(prefix):] : v for k, v in state_dict.items() if k.startswith(prefix)}
+    return {k[len(prefix) :]: v for k, v in state_dict.items() if k.startswith(prefix)}
 
 
 def match_state_dict(target_keys, state_dict, return_prefixes=False, strict=True):
@@ -25,12 +24,12 @@ def match_state_dict(target_keys, state_dict, return_prefixes=False, strict=True
         state_key = state_list[state_i]
         targ_key = target_list[target_i]
         if state_key.startswith(targ_key):
-            prefix = state_key[len(targ_key):][::-1]
+            prefix = state_key[len(targ_key) :][::-1]
             prefix_candidates[prefix] += 1
 
             state_i += 1
         else:
-            target_i += 1                    
+            target_i += 1
 
     prefixes = [prefix for prefix, count in prefix_candidates.items() if count == len(target_keys)]
 
@@ -46,7 +45,7 @@ def match_state_dict(target_keys, state_dict, return_prefixes=False, strict=True
             assert len(prefix_candidates) > 0
 
             prefix = max(prefix_candidates.items(), key=lambda x: x[1])[0]
-            
+
         assert len(prefix) == 0 or prefix.endswith(".")
     except AssertionError as e:
         raise ValueError("Incompatible state_dicts: {} and {}".format(target_keys, state_dict.keys()))
@@ -55,48 +54,49 @@ def match_state_dict(target_keys, state_dict, return_prefixes=False, strict=True
 
 
 def load_by_all_means(path, warn=True):
-    #Loading state_dicts and lightning modules
-    
+    # Loading state_dicts and lightning modules
+
     try:
-        data = torch.load(path, map_location='cpu')        
+        data = torch.load(path, map_location='cpu')
     except ModuleNotFoundError:
-        #maybe it is apex issue?
+        # maybe it is apex issue?
 
         import pickle
 
         class UpicklePatch(pickle.Unpickler):
-            def find_class(self, module, name):                    
+            def find_class(self, module, name):
                 if name == "FusedAdamFix" or name == "FusedAdam":
                     module = "torch.optim"
                     name = "AdamW"
 
                 return super().find_class(module, name)
-            
+
         class PicklePatch:
             Unpickler = UpicklePatch
-        
+
         data = torch.load(path, pickle_module=PicklePatch, map_location='cpu')
         if warn:
-            print("Warning: Supressing apex import error", file=sys.stderr)        
+            print("Warning: Supressing apex import error", file=sys.stderr)
 
     if 'state_dict' in data and 'epoch' in data:
-        #Yep, we get lit_checkpoint and not state_dict
+        # Yep, we get lit_checkpoint and not state_dict
 
-        #just in case we need them
+        # just in case we need them
         hparams = data.get("hparams", data.get("hyper_parameters"))
 
         data = data['state_dict']
 
         if warn:
-            print("Warning: Loading lit_checkpoint, not state_dict", file=sys.stderr)        
+            print("Warning: Loading lit_checkpoint, not state_dict", file=sys.stderr)
 
     return data
 
-#load state_dicts, lit_modules, fixing all known possible errors
+
+# load state_dicts, lit_modules, fixing all known possible errors
 def load_state_dict_by_all_means(model, state_dict, warn=True):
     data = state_dict
-    
-    try:        
+
+    try:
         model.load_state_dict(data)
         return
     except RuntimeError:
@@ -105,19 +105,18 @@ def load_state_dict_by_all_means(model, state_dict, warn=True):
         except ValueError:
             raise RuntimeError("Can't match {} with model, sorry".format(state_dict))
 
-        try:            
+        try:
             model.load_state_dict(fixed_data)
             return
         except RuntimeError:
-            #fix for 'embeddings.position_ids' missing in new versions of torch
+            # fix for 'embeddings.position_ids' missing in new versions of torch
             res = model.load_state_dict(fixed_data, strict=False)
-            #assert len(res.unexpected_keys) == 0
+            # assert len(res.unexpected_keys) == 0
 
             if warn:
-                #print("Ignoring missing_keys: {}".format(res.missing_keys), file=sys.stderr)
+                # print("Ignoring missing_keys: {}".format(res.missing_keys), file=sys.stderr)
                 print("Warning: ignoring {}".format(res), file=sys.stderr)
 
-            return            
+            return
 
     raise RuntimeError("Can't load {} for model, sorry".format(state_dict))
-

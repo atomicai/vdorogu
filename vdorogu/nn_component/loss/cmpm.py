@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+
 def compute_cmpm_loss_weighted(image_embeddings, text_embeddings, labels, weight=None, epsilon=1e-8):
     """
     Cross-Modal Projection Matching Loss(CMPM)
@@ -18,8 +19,8 @@ def compute_cmpm_loss_weighted(image_embeddings, text_embeddings, labels, weight
     batch_size = image_embeddings.shape[0]
     labels_reshape = torch.reshape(labels, (batch_size, 1))
     labels_dist = labels_reshape - labels_reshape.t()
-    labels_mask = (labels_dist == 0)
-    
+    labels_mask = labels_dist == 0
+
     image_norm = image_embeddings / image_embeddings.norm(dim=1, keepdim=True)
     text_norm = text_embeddings / text_embeddings.norm(dim=1, keepdim=True)
     image_proj_text = torch.matmul(image_embeddings, text_norm.t())
@@ -27,10 +28,10 @@ def compute_cmpm_loss_weighted(image_embeddings, text_embeddings, labels, weight
 
     # normalize the true matching distribution
     labels_mask_norm = labels_mask.float() / labels_mask.float().sum(dim=1)
-     
+
     i2t_pred = F.softmax(image_proj_text, dim=1)
     i2t_loss = i2t_pred * (F.log_softmax(image_proj_text, dim=1) - torch.log(labels_mask_norm + epsilon))
-    
+
     t2i_pred = F.softmax(text_proj_image, dim=1)
     t2i_loss = t2i_pred * (F.log_softmax(text_proj_image, dim=1) - torch.log(labels_mask_norm + epsilon))
 
@@ -42,11 +43,12 @@ def compute_cmpm_loss_weighted(image_embeddings, text_embeddings, labels, weight
 
     cmpm_loss = (i2t_loss * weight).sum() / weight.sum() + (t2i_loss * weight).sum() / weight.sum()
     sim_cos = torch.matmul(image_norm, text_norm.t())
-    
+
     pos_sim = torch.masked_select(sim_cos, labels_mask)
     neg_sim = torch.masked_select(sim_cos, labels_mask == 0)
-    
+
     return cmpm_loss, pos_sim, neg_sim
+
 
 def compute_cmpm_loss(image_embeddings, text_embeddings, labels, epsilon=1e-8):
     """
@@ -64,8 +66,8 @@ def compute_cmpm_loss(image_embeddings, text_embeddings, labels, epsilon=1e-8):
     batch_size = image_embeddings.shape[0]
     labels_reshape = torch.reshape(labels, (batch_size, 1))
     labels_dist = labels_reshape - labels_reshape.t()
-    labels_mask = (labels_dist == 0)
-    
+    labels_mask = labels_dist == 0
+
     image_norm = image_embeddings / image_embeddings.norm(dim=1, keepdim=True)
     text_norm = text_embeddings / text_embeddings.norm(dim=1, keepdim=True)
     image_proj_text = torch.matmul(image_embeddings, text_norm.t())
@@ -73,20 +75,21 @@ def compute_cmpm_loss(image_embeddings, text_embeddings, labels, epsilon=1e-8):
 
     # normalize the true matching distribution
     labels_mask_norm = labels_mask.float() / labels_mask.float().sum(dim=1)
-     
+
     i2t_pred = F.softmax(image_proj_text, dim=1)
     i2t_loss = i2t_pred * (F.log_softmax(image_proj_text, dim=1) - torch.log(labels_mask_norm + epsilon))
-    
+
     t2i_pred = F.softmax(text_proj_image, dim=1)
     t2i_loss = t2i_pred * (F.log_softmax(text_proj_image, dim=1) - torch.log(labels_mask_norm + epsilon))
 
     cmpm_loss = i2t_loss.sum(dim=1).mean() + t2i_loss.sum(dim=1).mean()
     sim_cos = torch.matmul(image_norm, text_norm.t())
-    
+
     pos_sim = torch.masked_select(sim_cos, labels_mask)
     neg_sim = torch.masked_select(sim_cos, labels_mask == 0)
-    
+
     return cmpm_loss, pos_sim, neg_sim
+
 
 def compute_cmpc_loss(W, image_embeddings, text_embeddings, labels):
     """
@@ -108,7 +111,7 @@ def compute_cmpc_loss(W, image_embeddings, text_embeddings, labels):
 
     image_logits = torch.matmul(image_proj_text, self.W_norm)
     text_logits = torch.matmul(text_proj_image, self.W_norm)
-    
+
     cmpc_loss = criterion(image_logits, labels) + criterion(text_logits, labels)
 
     # classification accuracy for observation
@@ -119,6 +122,7 @@ def compute_cmpc_loss(W, image_embeddings, text_embeddings, labels):
     text_precision = torch.mean((text_pred == labels).float())
 
     return cmpc_loss, image_precision, text_precision
+
 
 class CMPMLoss(nn.Module):
     def __init__(self, feature_size, num_classes, CMPM=True, CMPC=False, epsilon=1e-8):
@@ -133,21 +137,23 @@ class CMPMLoss(nn.Module):
         self.init_weight()
 
     def init_weight(self):
-        nn.init.xavier_uniform_(self.W.data, gain=1)        
+        nn.init.xavier_uniform_(self.W.data, gain=1)
 
     def forward(self, image_embeddings, text_embeddings, labels):
-        result = {m: 0.0 for m in ['loss', 'cmpm', 'cmpc', 'image_precision', 
-                  'text_precision', 'negative_similarity', 'position_similarity']}
-        
+        result = {
+            m: 0.0
+            for m in ['loss', 'cmpm', 'cmpc', 'image_precision', 'text_precision', 'negative_similarity', 'position_similarity']
+        }
+
         if self.CMPM:
-            result['cmpm'], result['positive_similarity'], result['negative_similarity'] = \
-                compute_cmpm_loss(image_embeddings, text_embeddings, labels)
-            
+            result['cmpm'], result['positive_similarity'], result['negative_similarity'] = compute_cmpm_loss(
+                image_embeddings, text_embeddings, labels
+            )
+
         if self.CMPC:
-            result['cmpc'], result['image_precision'], result['text_precision'] = \
-                compute_cmpc_loss(self.W, image_embeddings, text_embeddings, labels)
-        
+            result['cmpc'], result['image_precision'], result['text_precision'] = compute_cmpc_loss(
+                self.W, image_embeddings, text_embeddings, labels
+            )
+
         result['loss'] = result['cmpm'] + result['cmpc']
         return result
-
-

@@ -1,52 +1,51 @@
-import torch
-import transformers
 import sys
 
-from transformers import XLMRobertaConfig, XLMRobertaModel
-from transformers import XLMRobertaForMaskedLM
-from transformers.models.bert.modeling_bert import * 
+import torch
+import transformers
 from nn_component.layer.pooling import MaxPool2D as MaxPool
 from nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
+from transformers import XLMRobertaConfig, XLMRobertaForMaskedLM, XLMRobertaModel
+from transformers.models.bert.modeling_bert import *
 
 CONFIG = {
-"hidden_size": 64,
-"hidden_act": "gelu",
-"initializer_range": 0.02,
-"hidden_dropout_prob": 0.1,
-"num_attention_heads": 4,
-"type_vocab_size": 2,
-"num_hidden_layers": 1,
-"intermediate_size": 256,
-"attention_probs_dropout_prob": 0.1,
-"layer_norm_eps": 1e-05,
-"max_position_embeddings": 50,
-"vocab_size": 1
+    "hidden_size": 64,
+    "hidden_act": "gelu",
+    "initializer_range": 0.02,
+    "hidden_dropout_prob": 0.1,
+    "num_attention_heads": 4,
+    "type_vocab_size": 2,
+    "num_hidden_layers": 1,
+    "intermediate_size": 256,
+    "attention_probs_dropout_prob": 0.1,
+    "layer_norm_eps": 1e-05,
+    "max_position_embeddings": 50,
+    "vocab_size": 1,
 }
 
 CONFIG_LARGE = {
-"hidden_size": 256,
-"hidden_act": "gelu",
-"initializer_range": 0.02,
-"hidden_dropout_prob": 0.1,
-"num_attention_heads": 4,
-"type_vocab_size": 2,
-"num_hidden_layers": 1,
-"intermediate_size": 1024,
-"attention_probs_dropout_prob": 0.1,
-"layer_norm_eps": 1e-05,
-"max_position_embeddings": 50,
-"vocab_size": 1
-} 
+    "hidden_size": 256,
+    "hidden_act": "gelu",
+    "initializer_range": 0.02,
+    "hidden_dropout_prob": 0.1,
+    "num_attention_heads": 4,
+    "type_vocab_size": 2,
+    "num_hidden_layers": 1,
+    "intermediate_size": 1024,
+    "attention_probs_dropout_prob": 0.1,
+    "layer_norm_eps": 1e-05,
+    "max_position_embeddings": 50,
+    "vocab_size": 1,
+}
+
 
 class BertDSSMNoProj(nn.Module):
-    """Construct the embeddings from word, position and token_type embeddings.
-    """
+    """Construct the embeddings from word, position and token_type embeddings."""
+
     def __init__(self, config_path, checkpoint_path=None):
         super().__init__()
         conf = XLMRobertaConfig.from_pretrained(config_path)
         self.bert = XLMRobertaModel(conf)
-        self.bert.embeddings.token_type_embeddings.weight.data.normal_(
-            0, 0.02)
+        self.bert.embeddings.token_type_embeddings.weight.data.normal_(0, 0.02)
         self.pad_token_id = 1
         self.max_pool = MaxPool(batch_first=True)
 
@@ -59,17 +58,16 @@ class BertDSSMNoProj(nn.Module):
                 print("Warning: initing only bert part of BertDSSM model", file=sys.stderr)
 
     def forward(self, inputs, is_query=True):
-        token_type_ids = torch.zeros_like(
-            inputs) if is_query else torch.ones_like(inputs)
+        token_type_ids = torch.zeros_like(inputs) if is_query else torch.ones_like(inputs)
         attention_mask = inputs != self.pad_token_id
-        
-        if self.pad_token_id < 0:     
+
+        if self.pad_token_id < 0:
             inputs[~attention_mask] = 0
 
-        x = self.bert(inputs, token_type_ids=token_type_ids,
-                         attention_mask=attention_mask)[0]
+        x = self.bert(inputs, token_type_ids=token_type_ids, attention_mask=attention_mask)[0]
         x = self.max_pool(x, attention_mask)
         return x
+
 
 class DocBertEmbeddings(nn.Module):
     """Construct the embeddings from word, position and token_type embeddings."""
@@ -94,9 +92,7 @@ class DocBertEmbeddings(nn.Module):
                 persistent=False,
             )
 
-    def forward(
-        self, input_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None, past_key_values_length=0
-    ):
+    def forward(self, input_ids=None, token_type_ids=None, position_ids=None, inputs_embeds=None, past_key_values_length=0):
         if input_ids is not None:
             input_shape = input_ids.size()
         else:
@@ -123,17 +119,17 @@ class DocBertEmbeddings(nn.Module):
         token_type_embeddings = self.token_type_embeddings(token_type_ids)
 
         embeddings = inputs_embeds + token_type_embeddings
-        
-        #if self.position_embedding_type == "absolute":
+
+        # if self.position_embedding_type == "absolute":
         #    position_embeddings = self.position_embeddings(position_ids)
         #    embeddings += position_embeddings
-        
+
         embeddings = self.LayerNorm(embeddings)
         embeddings = self.dropout(embeddings)
         return embeddings
 
-class DocBertModel(BertPreTrainedModel):
 
+class DocBertModel(BertPreTrainedModel):
     def __init__(self, config, add_pooling_layer=True):
         super().__init__(config)
         self.config = config
@@ -175,11 +171,8 @@ class DocBertModel(BertPreTrainedModel):
         output_hidden_states=None,
         return_dict=None,
     ):
-
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
-        output_hidden_states = (
-            output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
-        )
+        output_hidden_states = output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
         return_dict = return_dict if return_dict is not None else self.config.use_return_dict
 
         if self.config.is_decoder:

@@ -1,7 +1,8 @@
 import numpy as np
 
 from vdorogu.inferencer.inference import *
-from vdorogu.nn_component.metric.ir_metrics import test_model, test_auc
+from vdorogu.nn_component.metric.ir_metrics import test_auc, test_model
+
 
 def get_groups(column):
     group = []
@@ -9,26 +10,27 @@ def get_groups(column):
     prev = None
     for x in column:
         x = tuple(x)
-        if x!= prev:
-            k+=1
+        if x != prev:
+            k += 1
             prev = x
         group.append(k)
     return np.array(group)
 
+
 def add_special_args():
     parser = add_args()
-    parser.add_argument('--labels_path', type=str, default=None,
-                        help='path to labels for compute metric')    
-    parser.add_argument('--metric', type=str, default=None,
-                        help='type of metric to evaluate')
+    parser.add_argument('--labels_path', type=str, default=None, help='path to labels for compute metric')
+    parser.add_argument('--metric', type=str, default=None, help='type of metric to evaluate')
 
     return parser
+
 
 def get_metric_args():
     parser = add_special_args()
     args = parser.parse_args()
 
     return args, args.model_params
+
 
 def main(hparams, model_params):
     if hparams.input == "-":
@@ -42,7 +44,7 @@ def main(hparams, model_params):
     if hparams.output == "-":
         output = sys.stdout
     else:
-        output = open(hparams.output, 'wt')    
+        output = open(hparams.output, 'wt')
 
     if hparams.labels_path:
         labels = np.loadtxt(hparams.labels_path)
@@ -55,18 +57,18 @@ def main(hparams, model_params):
         mode=hparams.mode,
         half=hparams.half,
         gpus=hparams.gpus,
-        model_params=model_params
+        model_params=model_params,
     )
 
     inf.stdout = output
 
     input_texts = [line.rstrip('\n\r').split('\t') for line in input]
-    qids = get_groups([elem[0] for elem in input_texts]) # compute qids
+    qids = get_groups([elem[0] for elem in input_texts])  # compute qids
     print("Num test points:", len(input_texts), file=sys.stderr)
 
     result = inf.inference_fields(input_texts, debug=hparams.debug)
     result = np.vstack([batch.reshape(-1, 1) for batch in result]).ravel()
-    
+
     assert len(result) == len(labels), f"Wrong len of labels {len(labels)} or input texts {len(result)}"
 
     print("Model:", hparams.model)

@@ -5,16 +5,15 @@ from __future__ import division, print_function, unicode_literals
 
 import argparse
 import sys
-
 from itertools import groupby
 
 import numpy as np
 from scipy import stats
-from sklearn.metrics import roc_auc_score, precision_recall_curve
+from sklearn.metrics import precision_recall_curve, roc_auc_score
 
 
 def eprint(*args, **kwargs):
-        print(*args, file=sys.stderr, **kwargs)
+    print(*args, file=sys.stderr, **kwargs)
 
 
 def calc_average_metric(queries_data, calc_metric, param):
@@ -39,8 +38,8 @@ def calc_ndcg_by_query(queries_data, new_query, k):
     query_predicts = queries_data[new_query]['predictions']
     query_relevance = queries_data[new_query]['relevance']
     if all(query_relevance[0] == i for i in query_relevance):
-         return None
-    sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True, key=lambda x : x[0]) ]
+        return None
+    sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True, key=lambda x: x[0])]
     return calc_ndcg(sort_query_relevance, k)
 
 
@@ -48,7 +47,7 @@ def calc_dcg_by_query(queries_data, new_query, k):
     query_predicts = queries_data[new_query]['predictions']
     query_relevance = queries_data[new_query]['relevance']
     if all(query_relevance[0] == i for i in query_relevance):
-         return None
+        return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
     return calc_dcg(sort_query_relevance, k, verbose=False)
 
@@ -58,11 +57,11 @@ def calc_max_dcg_by_query(queries_data, new_query, k):
     return calc_dcg(sorted(r, reverse=True), k, verbose=False)
 
 
-def calc_ndcg(r, k,verbose=False):
+def calc_ndcg(r, k, verbose=False):
     dcg_max = calc_dcg(sorted(r, reverse=True), k, verbose)
     # empty list of marks?
     if not dcg_max:
-        return 0.
+        return 0.0
     return calc_dcg(r, k, verbose) / dcg_max
 
 
@@ -71,12 +70,12 @@ def calc_dcg(r, k, verbose=False):
         k = len(r)
     r = np.asfarray(r)[:k]
     if r.size:
-        #local_dcg = np.sum( (r) / np.log2(np.arange(2, r.size + 2)))
-        local_dcg = np.sum( (np.power(2.0, r) - 1) / np.log2(np.arange(2, r.size + 2)))
+        # local_dcg = np.sum( (r) / np.log2(np.arange(2, r.size + 2)))
+        local_dcg = np.sum((np.power(2.0, r) - 1) / np.log2(np.arange(2, r.size + 2)))
         if verbose:
-            print (local_dcg)
+            print(local_dcg)
         return local_dcg
-    return 0.
+    return 0.0
 
 
 def calc_precision_by_query(queries_data, new_query, p, threshold=3):
@@ -87,7 +86,7 @@ def calc_precision_by_query(queries_data, new_query, p, threshold=3):
     else:
         new_p = p
     if all(query_relevance[0] == i for i in query_relevance):
-         return None
+        return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
     top_rel = np.array(sort_query_relevance[0:new_p])
     relevant_docs_count = len(top_rel[top_rel >= threshold])
@@ -101,7 +100,7 @@ def calc_recall_by_query(queries_data, new_query, r, threshold=3):
     query_predicts = queries_data[new_query]['predictions']
     query_relevance = queries_data[new_query]['relevance']
     if all(query_relevance[0] == i for i in query_relevance):
-         return None
+        return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
     num_of_rel = sum(1 * (np.array(query_relevance) >= threshold))
     top_rel = np.array(sort_query_relevance[0:num_of_rel])
@@ -121,7 +120,7 @@ def calc_f1_by_query(queries_data, new_query, p, threshold=3):
     rec_score = calc_recall_by_query(queries_data, new_query, None)
     if prec_score is None or rec_score is None:
         return None
-    return (2 * prec_score * rec_score) /  (prec_score + rec_score)
+    return (2 * prec_score * rec_score) / (prec_score + rec_score)
 
 
 def calc_defective_pairs_by_query(queries_data, new_query, d):
@@ -135,7 +134,7 @@ def calc_defective_pairs_by_query(queries_data, new_query, d):
         new_d = d
     defect_pairs = 0
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
-    sort_query_relevance  = sort_query_relevance[0:new_d]
+    sort_query_relevance = sort_query_relevance[0:new_d]
     for i in range(0, len(sort_query_relevance)):
         rels = np.array(sort_query_relevance[0:i])
         defect_pairs += len(rels[rels < sort_query_relevance[i]])
@@ -182,13 +181,13 @@ def calc_err_by_query(queries_data, new_query, e):
         return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
     if e is None:
-        new_e = min (10, len(query_predicts))
+        new_e = min(10, len(query_predicts))
     else:
-        new_e = min (e, len(query_predicts))
+        new_e = min(e, len(query_predicts))
     p_i = 1.0
     err = 0.0
     for i in range(1, new_e + 1):
-        new_prob = map_mark_to_prob(sort_query_relevance[i-1])
+        new_prob = map_mark_to_prob(sort_query_relevance[i - 1])
         err += 1.0 * new_prob * p_i / (1.0 * i)
         p_i = p_i * (1.0 - new_prob)
     return err
@@ -216,17 +215,17 @@ def calc_good_by_query(queries_data, new_query, threshold):
     return 0
 
 
-def test_model(y_pred, y_true, groups, k = 5):
+def test_model(y_pred, y_true, groups, k=5):
     res = {}
-    for key, group in groupby(zip(y_pred, y_true, groups), key = lambda x: x[2]):
+    for key, group in groupby(zip(y_pred, y_true, groups), key=lambda x: x[2]):
         group = list(zip(*group))
-        res[key] = {'relevance' : group[1], 'predictions' : group[0]}
+        res[key] = {'relevance': group[1], 'predictions': group[0]}
     return calc_average_metric(res, calc_ndcg_by_query, k)
 
 
-def test_spearman(y_pred, y_true, groups, k = None):
+def test_spearman(y_pred, y_true, groups, k=None):
     res = []
-    for key, group in groupby(zip(y_pred, y_true, groups), key = lambda x: x[2]):
+    for key, group in groupby(zip(y_pred, y_true, groups), key=lambda x: x[2]):
         group = [np.array(item).reshape(-1) for item in list(zip(*group))]
         indices = np.argsort(group[1])[::-1]
         if k:
@@ -235,17 +234,18 @@ def test_spearman(y_pred, y_true, groups, k = None):
             correlation = stats.spearmanr(group[1], group[0]).correlation
 
         res.append(correlation if not np.isnan(correlation) else 0)
-    
+
     return np.mean(res)
 
 
 def test_auc(y_pred, y_true, groups):
     res = []
-    for key,group in groupby(zip(y_pred,y_true,groups), key = lambda x: x[2]):
+    for key, group in groupby(zip(y_pred, y_true, groups), key=lambda x: x[2]):
         group = list(zip(*group))
         group[1] = (np.array(group[1]) > 1).astype(int)
-        if np.unique(group[1]).shape[0] < 2: continue
-        res.append(roc_auc_score(group[1],group[0]))
+        if np.unique(group[1]).shape[0] < 2:
+            continue
+        res.append(roc_auc_score(group[1], group[0]))
     return np.mean(res)
 
 
@@ -255,6 +255,6 @@ def find_nearest_index(array, value):
     return idx
 
 
-def test_precision_for_recall(y_pred, y_true, recall_values = [0.85, 0.91]):
+def test_precision_for_recall(y_pred, y_true, recall_values=[0.85, 0.91]):
     precision, recall, thresholds = precision_recall_curve(y_true, y_pred)
     return [(precision[find_nearest_index(recall, recall_value)], recall_value) for recall_value in recall_values]

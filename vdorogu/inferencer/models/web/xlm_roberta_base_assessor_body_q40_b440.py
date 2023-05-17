@@ -1,6 +1,7 @@
 from vdorogu.inferencer.base_container import match_arcifact_path
 from vdorogu.inferencer.models.base.bert_dssm import BertContainer
 
+
 class Container(BertContainer):
     def __init__(self, hparams):
         hparams.setdefault("query_maxlen", 40)

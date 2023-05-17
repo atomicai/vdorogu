@@ -1,6 +1,7 @@
+from typing import List, Union
+
 import catalyst as cat
 import numpy as np
-from typing import List, Union
 
 
 class Monitor:

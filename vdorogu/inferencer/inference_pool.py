@@ -1,13 +1,16 @@
-import torch.multiprocessing as mp
 import copy
 import warnings
+from functools import partial
+
+import torch.multiprocessing as mp
+from torch.multiprocessing import Pool, set_start_method
 
 from vdorogu.inferencer.inference import *
-from torch.multiprocessing import Pool, set_start_method
-from functools import partial
+
 
 def pool_wrapper(fields, f):
     return f(*fields)
+
 
 class PoolDataset(IterableDataset):
     def __init__(self, data_generator, container, cpu_count=1, chunksize=1):
@@ -48,7 +51,7 @@ class InferencerPool(Inferencer):
         if chunksize:
             self.chunksize = chunksize
         else:
-            self.chunksize = self.bs * 2 
+            self.chunksize = self.bs * 2
 
     def inference_fields_realtime(self, data_generator, debug=False):
         dataset = PoolDataset(data_generator, self.container, self.cpu_count, self.chunksize)
@@ -58,12 +61,10 @@ class InferencerPool(Inferencer):
     @staticmethod
     def add_poll_specific_args(parent_parser):  # pragma: no-cover
         parser = argparse.ArgumentParser(parents=[parent_parser])
-        
-        parser.add_argument('--cpu_count', type=str, default='1',
-                               help='number of cpu to preprocess data, also accepts "all"')
 
-        parser.add_argument('--chunksize', type=int, default=None,
-                               help='size of chunk to process by 1 worker in pool')
+        parser.add_argument('--cpu_count', type=str, default='1', help='number of cpu to preprocess data, also accepts "all"')
+
+        parser.add_argument('--chunksize', type=int, default=None, help='size of chunk to process by 1 worker in pool')
         return parser
 
 
@@ -74,8 +75,11 @@ def get_pool_args():
 
     return args, {}
 
+
 def main(hparams, model_params):
-    print("Warning!!! Using this module can cause errors and lead to incorrect results. Please use it with caution.", file=sys.stderr)
+    print(
+        "Warning!!! Using this module can cause errors and lead to incorrect results. Please use it with caution.", file=sys.stderr
+    )
 
     if hparams.input == "-":
         input = sys.stdin
@@ -88,14 +92,13 @@ def main(hparams, model_params):
     if hparams.output == "-":
         output = sys.stdout
     else:
-        output = open(hparams.output, 'wt')    
+        output = open(hparams.output, 'wt')
 
-    if hparams.gpus != '0' and hparams.cpu_count != '1': 
+    if hparams.gpus != '0' and hparams.cpu_count != '1':
         try:
             torch.multiprocessing.set_start_method('spawn')
         except RuntimeError:
             pass
-
 
     inf = InferencerPool(
         model=hparams.model,
@@ -107,7 +110,7 @@ def main(hparams, model_params):
         gpus=hparams.gpus,
         model_params=model_params,
         cpu_count=hparams.cpu_count,
-        chunksize=hparams.chunksize
+        chunksize=hparams.chunksize,
     )
 
     inf.stdout = output

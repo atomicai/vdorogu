@@ -1,15 +1,13 @@
-from vdorogu.inferencer.base_container import Container, match_arcifact_path
-
-from transformers import AutoTokenizer, RobertaTokenizer, BertTokenizer
-from vdorogu.nn_component.model.nlp.bert_dssm import BertDSSM, Bert, BertSentenceEmbDSSM
-from vdorogu.dataset.web import valid_collate, valid_collate_dssm, bert_concat
-from vdorogu.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
-
 from collections import OrderedDict
 
 import numpy as np
-
 import torch
+from transformers import AutoTokenizer, BertTokenizer, RobertaTokenizer
+
+from vdorogu.dataset.web import bert_concat, valid_collate, valid_collate_dssm
+from vdorogu.inferencer.base_container import Container, match_arcifact_path
+from vdorogu.nn_component.model.nlp.bert_dssm import Bert, BertDSSM, BertSentenceEmbDSSM
+from vdorogu.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
 
 
 class BertDSSMContainer(Container):

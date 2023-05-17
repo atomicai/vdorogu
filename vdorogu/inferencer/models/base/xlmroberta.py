@@ -1,13 +1,11 @@
-from vdorogu.inferencer.base_container import Container, match_arcifact_path
-
-from transformers import AutoTokenizer, XLMRobertaConfig, XLMRobertaForSequenceClassification
-from vdorogu.dataset.web import valid_collate, bert_concat
-
 from collections import OrderedDict
 
 import numpy as np
 import torch
+from transformers import AutoTokenizer, XLMRobertaConfig, XLMRobertaForSequenceClassification
 
+from vdorogu.dataset.web import bert_concat, valid_collate
+from vdorogu.inferencer.base_container import Container, match_arcifact_path
 from vdorogu.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
 
 

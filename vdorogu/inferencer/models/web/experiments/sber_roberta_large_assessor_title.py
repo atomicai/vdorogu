@@ -3,7 +3,7 @@ from inferencer.models.base.bert_dssm import BertContainer
 
 
 class Container(BertContainer):
-    def __init__(self, hparams):        
+    def __init__(self, hparams):
         super().__init__(hparams)
 
         self.config_path = "sberbank-ai/ruRoberta-large"

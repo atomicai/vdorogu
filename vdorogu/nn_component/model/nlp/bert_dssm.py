@@ -1,26 +1,46 @@
-import os
 import math
+import os
 import sys
 from functools import partial
 
-# from transformers.models.bert.modeling_bert import BertEmbeddings
-from transformers import XLMRobertaConfig, XLMRobertaModel
-from transformers import XLMRobertaForMaskedLM
-
-# from transformers.models.roberta.modeling_roberta import create_position_ids_from_input_ids
-from transformers import *
-
 import numpy as np
-from torch.nn import LayerNorm as BertLayerNorm
-from torch.nn.functional import gelu
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.nn import LayerNorm as BertLayerNorm
+from torch.nn.functional import gelu
 from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence, pad_sequence
 
-from vdorogu.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
-from vdorogu.nn_component.layer.pooling import MaxPool2D as MaxPool
+# from transformers.models.roberta.modeling_roberta import create_position_ids_from_input_ids
+# from transformers.models.bert.modeling_bert import BertEmbeddings
+from transformers import (
+    AlbertConfig,
+    AlbertModel,
+    AlbertTokenizer,
+    BartConfig,
+    BartModel,
+    BartTokenizer,
+    BertConfig,
+    BertModel,
+    BertTokenizer,
+    ElectraConfig,
+    ElectraModel,
+    ElectraTokenizer,
+    RobertaConfig,
+    RobertaModel,
+    RobertaTokenizer,
+    XLMRobertaConfig,
+    XLMRobertaForMaskedLM,
+    XLMRobertaModel,
+    XLMRobertaTokenizer,
+    XLNetConfig,
+    XLNetModel,
+    XLNetTokenizer,
+)
+
 from vdorogu.nn_component.layer.noise import GaussianNoise
+from vdorogu.nn_component.layer.pooling import MaxPool2D as MaxPool
+from vdorogu.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means
 
 MODEL_CLASSES = {
     "bert": (BertConfig, BertModel, BertTokenizer),

@@ -1,6 +1,7 @@
 import numpy as np
 
-class SparseContainer():
+
+class SparseContainer:
     def __init__(self, data):
         self.data = np.concatenate(data).astype(np.int32)
         self.indptr = np.cumsum([0] + [len(x) for x in data]).astype(np.int64)
@@ -10,7 +11,7 @@ class SparseContainer():
             data = [self[x] for x in idx]
             return self.__class__(data)
         start = self.indptr[idx]
-        end = self.indptr[idx+1]
+        end = self.indptr[idx + 1]
         return self.data[start:end]
 
     def __len__(self):
@@ -21,7 +22,7 @@ class SparseContainer():
         return (self.indptr.shape[0] - 1,)
 
 
-class UniqueSparseContainer():
+class UniqueSparseContainer:
     def __init__(self, container, qids):
         _, query_index = np.unique(qids, return_index=True)
         self.unique_sparse_container = container[query_index]

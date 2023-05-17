@@ -1,11 +1,14 @@
-import numpy as np
 import hashlib
+
+import numpy as np
 from pipeline.SOTA.web_rank.yandex_dssm.source.src.utils import view_iterator
 from torch.utils.data import Dataset
+
 
 def calc_sq_dcg(preds, labels, at):
     order = np.argsort(-preds)[:at]
     return np.sum((2 ** labels[order] - 1) / np.log2(2 + np.arange(len(order))))
+
 
 class SQDataset(Dataset):
     def __init__(self, path, indexer, max_token_len):
@@ -37,8 +40,8 @@ class SQDataset(Dataset):
             cur_size += 1
             q = indexer(q.split())[:max_token_len]
             t = indexer(t.split())[:max_token_len]
-            self.queries[i, :len(q)] = q
-            self.titles[i, :len(t)] = t
+            self.queries[i, : len(q)] = q
+            self.titles[i, : len(t)] = t
         self.sizes.append(cur_size)
         self.sizes = np.array(self.sizes, dtype=np.int32)
 
@@ -47,7 +50,7 @@ class SQDataset(Dataset):
 
     def __getitem__(self, idx):
         return self.queries[idx], self.titles[idx], self.labels[idx], self.qids[idx]
-        
+
     def ndcg(self, predictions, at=5):
         ndcgs = []
         for p, l in zip(view_iterator(self.sizes, predictions), view_iterator(self.sizes, self.labels)):

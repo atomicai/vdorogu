@@ -1,16 +1,17 @@
-import os, sys
 import ctypes
+import itertools
 import logging
-from ctypes import cdll
+import os
+import sys
 from collections import Counter, defaultdict
-from torch.utils.data import IterableDataset
+from ctypes import cdll
 
 import numpy as np
 import torch
-import itertools
+from torch.utils.data import IterableDataset
 
 so_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../bin/libqltreader.so'))
-#print(so_path)
+# print(so_path)
 libqltreader = cdll.LoadLibrary(so_path)
 libqltreader.QLTReader_new.restype = ctypes.c_void_p
 libqltreader.QLTReader_new.argtypes = [ctypes.c_void_p, ctypes.c_int, ctypes.c_int]
@@ -30,12 +31,13 @@ class Recover:
                 word, cnt = word.strip().split('\t')
                 word = word.strip().lower()
                 self.words.append(word.strip())
-    
+
     def __call__(self, idxs):
         return self.recover(idxs)
 
     def recover(self, idxs):
         return ' '.join(self.words[i - 2] if i != 1 else '<UNK>' for i in idxs if i != 0)
+
 
 class Indexer:
     def __init__(self, dict_path):
@@ -47,12 +49,13 @@ class Indexer:
                 word = word.strip().lower()
                 self.word2idx[word] = idx
                 idx += 1
-    
+
     def __call__(self, words):
         return self.index(words)
 
     def index(self, words):
         return [self.word2idx.get(w.strip().lower(), 0) + 1 for w in words]
+
 
 class QLTReader(object):
     def __init__(self, qlt_path, batch_size, num_queries):
@@ -73,7 +76,7 @@ class QLTReader(object):
             self.read()
             nq = self.num_queries
             num_pairs = np.sum(self.group_sizes)
-            yield self.queries[:nq], self.group_sizes[:nq], self.titles[:num_pairs],self.labels[:num_pairs]
+            yield self.queries[:nq], self.group_sizes[:nq], self.titles[:num_pairs], self.labels[:num_pairs]
 
     def remaining(self):
         return libqltreader.QLTReader_Remaining(self.obj)
@@ -88,7 +91,8 @@ class QLTReader(object):
         labels = self.labels.ctypes.data_as(ctypes.POINTER(ctypes.c_int))
         self.num_queries = libqltreader.QLTReader_Write(self.obj, queries, group_sizes, titles, labels)
         return self.remaining()
-    
+
+
 class MultifileQLT(IterableDataset):
     def __init__(self, path, num_pairs=3072, num_queries=384):
         super(MultifileQLT).__init__()
@@ -96,7 +100,7 @@ class MultifileQLT(IterableDataset):
         self.num_pairs = num_pairs
         self.num_queries = num_queries
         logging.warning('Found %d binary objects' % len(self.files))
-        
+
     def __iter__(self):
         worker_info = torch.utils.data.get_worker_info()
         for fname in self.files:

@@ -1,8 +1,9 @@
 # Let's inherin from the parent interface class and create new pipeline
+import numpy as np
 from bertopic.backend import BaseEmbedder
+
 from vdorogu.modeling.mask import IInferencerMask
 from vdorogu.tooling import flatten_list
-import numpy as np
 
 
 class M1Model(BaseEmbedder):

@@ -3,7 +3,7 @@ from inferencer.models.base.rembert import RemBertContainer
 
 
 class Container(RemBertContainer):
-    def __init__(self, hparams):        
+    def __init__(self, hparams):
         super().__init__(hparams)
 
         self.config_path = "google/rembert"

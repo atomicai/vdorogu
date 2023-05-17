@@ -1,4 +1,4 @@
-LINE_WIDTH=129
+LINE_WIDTH=132
 NAME := $(shell python setup.py --name)
 UNAME := $(shell uname -s)
 ISORT_FLAGS=--line-width=${LINE_WIDTH} --profile black
