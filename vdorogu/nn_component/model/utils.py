@@ -1,4 +1,3 @@
-import os.path as osp
 import sys
 from collections import defaultdict
 
@@ -47,7 +46,7 @@ def match_state_dict(target_keys, state_dict, return_prefixes=False, strict=True
             prefix = max(prefix_candidates.items(), key=lambda x: x[1])[0]
 
         assert len(prefix) == 0 or prefix.endswith(".")
-    except AssertionError as e:
+    except AssertionError:
         raise ValueError("Incompatible state_dicts: {} and {}".format(target_keys, state_dict.keys()))
 
     return remove_prefix(prefix, state_dict)
@@ -82,7 +81,7 @@ def load_by_all_means(path, warn=True):
         # Yep, we get lit_checkpoint and not state_dict
 
         # just in case we need them
-        hparams = data.get("hparams", data.get("hyper_parameters"))
+        data.get("hparams", data.get("hyper_parameters"))
 
         data = data['state_dict']
 

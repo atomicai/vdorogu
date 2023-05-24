@@ -6,3 +6,5 @@ pyarrow==12.0.0
 Flask==2.0.1
 python-dotenv==0.21.1
 random-name==0.1.1
+catalyst==22.4
+kaleido==0.2.1

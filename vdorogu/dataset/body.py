@@ -4,9 +4,7 @@ import json
 import os
 import pickle
 import random
-import re
 import unicodedata
-from collections import defaultdict
 from itertools import chain
 
 import numpy as np
@@ -624,7 +622,7 @@ class FlatPassageDataset(Dataset):
             input_id = self.token_concat_flavour(self.tokenizer, query, passage)
             input_ids.append(input_id)
 
-        label = self.labels[idx]
+        self.labels[idx]
         return input_ids, passage_mask, self.labels[idx], self.qids[idx]
 
 

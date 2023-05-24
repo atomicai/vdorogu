@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 import numpy as np
 import torch
 from transformers import AutoTokenizer, XLMRobertaConfig, XLMRobertaForSequenceClassification

@@ -1,7 +1,4 @@
 import argparse
-import importlib
-import os.path as osp
-import sys
 
 import onnx
 import torch
@@ -14,7 +11,7 @@ def quantize_onnx_model(onnx_model_path, quantized_model_path):
     import onnx
     from onnxruntime.quantization import QuantType, quantize_dynamic
 
-    onnx_opt_model = onnx.load(onnx_model_path)
+    onnx.load(onnx_model_path)
     quantize_dynamic(onnx_model_path, quantized_model_path, weight_type=QuantType.QInt8)
 
 

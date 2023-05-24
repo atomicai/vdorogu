@@ -1,5 +1,4 @@
 import math
-import re
 import unicodedata
 from collections import defaultdict
 from itertools import chain
@@ -295,7 +294,7 @@ class FlatDataset(Dataset):
         )
 
         input_id = self.token_concat_flavour(self.tokenizer, query, document)
-        label = self.labels[idx]
+        self.labels[idx]
         return input_id, self.labels[idx], self.qids[idx]
 
 

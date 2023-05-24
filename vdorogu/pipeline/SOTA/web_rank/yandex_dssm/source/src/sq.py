@@ -1,8 +1,7 @@
-import hashlib
-
 import numpy as np
-from pipeline.SOTA.web_rank.yandex_dssm.source.src.utils import view_iterator
 from torch.utils.data import Dataset
+
+from pipeline.SOTA.web_rank.yandex_dssm.source.src.utils import view_iterator
 
 
 def calc_sq_dcg(preds, labels, at):

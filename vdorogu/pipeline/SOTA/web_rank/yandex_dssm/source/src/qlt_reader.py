@@ -2,8 +2,6 @@ import ctypes
 import itertools
 import logging
 import os
-import sys
-from collections import Counter, defaultdict
 from ctypes import cdll
 
 import numpy as np

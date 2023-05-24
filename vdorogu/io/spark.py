@@ -1,7 +1,6 @@
 import abc
 import getpass
 import os
-import sys
 
 from pyspark import SparkConf, SparkContext, SQLContext
 

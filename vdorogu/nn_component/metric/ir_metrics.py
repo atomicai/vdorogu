@@ -3,7 +3,6 @@
 
 from __future__ import division, print_function, unicode_literals
 
-import argparse
 import sys
 from itertools import groupby
 

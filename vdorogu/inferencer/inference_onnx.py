@@ -1,7 +1,4 @@
-import copy
 import os
-import warnings
-from functools import partial
 
 import onnx
 import onnxruntime as ort

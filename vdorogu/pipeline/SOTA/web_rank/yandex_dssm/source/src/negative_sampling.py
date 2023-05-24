@@ -1,9 +1,7 @@
-import logging
-import time
-
 import annoy
 import numpy as np
 import torch
+
 from pipeline.SOTA.web_rank.yandex_dssm.source.src.utils import NpCyclicBuffer, predict
 
 
