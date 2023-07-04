@@ -8,3 +8,9 @@ python-dotenv==0.21.1
 random-name==0.1.1
 catalyst==22.4
 kaleido==0.2.1
+requests-kerberos==0.14.0
+snakebite==2.11.0
+mysqlclient==2.2.0
+psycopg2-binary==2.9.6
+presto-python-client==0.8.3
+pyspark==3.4.1
