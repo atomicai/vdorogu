@@ -51,6 +51,31 @@ def _pl_match(db, col_x, col_y):
     return projected.select(pl.sum("match")).to_dict()["match"][0]
 
 
+def _pl_unique(db, column_name):
+    projected = (
+        db.with_row_count()
+        .with_columns([pl.first("row_nr").over(column_name).alias("mask")])
+        .filter(pl.col("row_nr") == pl.col("mask"))
+        .drop("mask")
+    )
+    return projected
+
+
+def view(xs, ys, using: str = "bar"):
+    import plotly.express as px
+
+    if using == "bar":
+        fig = px.bar(x=xs, y=ys)
+    else:
+        fig = px.line(x=xs, y=ys)
+    fig.update_layout(title=dict(text=title, font=dict(size=14), automargin=False, yref='paper'), xaxis={'type': 'category'})
+    fig.update_layout(yaxis_title=None)
+    fig.update_layout(xaxis_title=None)
+    fig.update_xaxes(tickfont_size=9, ticks="outside", ticklen=0.5, tickwidth=1)
+    fig.update_xaxes(tick)
+    return fig
+
+
 class ITest(unittest.TestCase):
     def setUp(self):
         self.where = Path.home() / "IDataset" / "mobapp" / "mobapp.parquet"
@@ -91,8 +116,10 @@ class ITest(unittest.TestCase):
         # Препроцессинг
         de = _pl_normalize(df, column_name="title")
         # Отдельно по источнику / магазину
-        de_droid = de.filter(pl.col("source") == "google").select(["title", "category"]).rename({"category": "iab_category_name"})
-        de_ios = de.filter(pl.col("source") == "apple").select(["title", "category"]).rename({"category": "iab_category_name"})
+        de_droid = (
+            de.filter(pl.col("source") == "google").select(["title", "category_id"]).join(df_meta_iab_droid, on="category_id")
+        )
+        de_ios = de.filter(pl.col("source") == "apple").select(["title", "category_id"]).join(df_meta_iab_ios, on="category_id")
         print("IO is ok")
         # Посмотрим на кол-во общих приложений,
         # Кол-во совпадений категорий среди них и насколько все плохо
@@ -107,8 +134,12 @@ class ITest(unittest.TestCase):
         db_proj_common = db_proj.filter(pl.col("common"))
         metrica = {}
         # сколько общих.
-        metrica["common_title"] = _pl_match(db_proj_common, col_x="iab_category_name", col_y="iab_category_name_right")
+        metrica["all"] = len(de)
+        metrica["common_title"] = db_proj_common.shape[0]
+        metrica["common_title_iab"] = _pl_match(db_proj_common, col_x="iab_category_name", col_y="iab_category_name_right")
+        metrica["variance"] = None
         # Считаем разброс по категориям (среди общих)
+        print()
 
 
 if __name__ == "__main__":
