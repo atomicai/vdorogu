@@ -1,6 +1,5 @@
-from typing import List
-
 import polars as pl
+from typing import List
 
 
 def _pl_project(db: pl.DataFrame, plane: pl.DataFrame, on: str, how: str = "inner"):
@@ -54,10 +53,14 @@ def _pl_unique(db: pl.DataFrame, column_name):
     return projected
 
 
-def _pl_contains(_df, col, words: List[str]):
+def _pl_contains(_df, col, words: List[str], cased: bool = False):
+    # regex pattern to count for word(s)
+    if not cased:
+        words = ["(?i)" + w for w in words]
     pattern = "|".join(words)
     _df = _df.with_columns([pl.col(col).str.contains(pattern).alias(f"silo_{col}")])
-    return _df
+    _cnt = int(str(list(_df.select(pl.sum(f"silo_{col}")).to_arrow()[0])[0]))
+    return _df, _cnt
 
 
 __all__ = ["_pl_project", "_pl_count", "_pl_as_dict", "_pl_normalize", "_pl_match", "_pl_unique", "_pl_contains"]
