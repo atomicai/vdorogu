@@ -1,4 +1,4 @@
-LINE_WIDTH=132
+LINE_WIDTH=122
 NAME := $(shell python setup.py --name)
 UNAME := $(shell uname -s)
 ISORT_FLAGS=--line-width=${LINE_WIDTH} --profile black
@@ -18,14 +18,14 @@ setup-pre-commit:
 	pre-commit run --all-files
 
 format:
-	isort ${ISORT_FLAGS} --check-only --diff ${NAME} vdorogu test
-	black ${BLACK_FLAGS} --check --diff ${NAME} vdorogu test
-	autoflake ${FLAKE_FLAGS} --in-place ${NAME} vdorogu test
+	isort ${ISORT_FLAGS} --check-only --diff ${NAME} external vkai test
+	black ${BLACK_FLAGS} --check --diff ${NAME} external vkai test
+	autoflake ${FLAKE_FLAGS} --in-place ${NAME} external vkai test
 
 format-fix:
-	isort ${ISORT_FLAGS} ${NAME} vdorogu test
-	black ${BLACK_FLAGS} ${NAME} vdorogu test
-	autoflake ${FLAKE_FLAGS} ${NAME} vdorogu test
+	isort ${ISORT_FLAGS} ${NAME} external vkai test
+	black ${BLACK_FLAGS} ${NAME} external vkai test
+	autoflake ${FLAKE_FLAGS} ${NAME} external vkai test
 
 run:
 	flask run --host=0.0.0.0 --port=7777
