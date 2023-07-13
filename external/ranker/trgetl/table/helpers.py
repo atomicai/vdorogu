@@ -25,7 +25,7 @@ def log(function: Callable) -> Callable:
         try:
             rownum = function(self, *args, **kwargs)
             success = 1
-            error = ''
+            error = ""
         except Exception as e:
             rownum = 0
             success = 0
@@ -45,20 +45,20 @@ def log(function: Callable) -> Callable:
                         user=[getpass.getuser()],
                         success=[success],
                         rows_inserted=[int(rownum)],
-                        arguments=[f'{args} {kwargs}'],
-                        error=[error.replace('\n', '    ')],
+                        arguments=[f"{args} {kwargs}"],
+                        error=[error.replace("\n", "    ")],
                         execution_time_sec=[round(time.time() - start_time_sec, 4)],
                     )
                 )
-                olap = Clickhouse('olap')
+                olap = Clickhouse("olap")
                 try:
-                    olap.insert('dwh.process_log', log_info, return_rownum=False)
+                    olap.insert("dwh.process_log", log_info, return_rownum=False)
                 except ClickhouseError as e:
-                    if 'Not enough privileges' in str(e):
-                        print('FAILED to log procces: not enough privileges')
+                    if "Not enough privileges" in str(e):
+                        print("FAILED to log procces: not enough privileges")
                     else:
                         raise e
-            print(f'{round(time.time() - start_time_sec)} sec')
+            print(f"{round(time.time() - start_time_sec)} sec")
         return rownum
 
     return wrapped
@@ -66,14 +66,14 @@ def log(function: Callable) -> Callable:
 
 def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, str]:
     """Get query parameter from database"""
-    olap = Clickhouse('olap')
+    olap = Clickhouse("olap")
     parameters = {}
 
-    parameters['date'] = '{date}'
+    parameters["date"] = "{date}"
     if date is not None:
-        parameters['date'] = str(date)
+        parameters["date"] = str(date)
         try:
-            parameters['active_experiments'] = (
+            parameters["active_experiments"] = (
                 olap.read(
                     f"""
                 with case when date_end > '2000-01-01' then date_end
@@ -84,21 +84,21 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
             """
                 )
                 .iloc[0, 0]
-                .strip('[]')
+                .strip("[]")
             )
-            if parameters['active_experiments'] == '':
-                parameters['active_experiments'] = "('',-1)"
+            if parameters["active_experiments"] == "":
+                parameters["active_experiments"] = "('',-1)"
         except ClickhouseError as e:
-            if 'Not enough privileges' in str(e):
-                parameters['active_experiments'] = "('',-1)"
+            if "Not enough privileges" in str(e):
+                parameters["active_experiments"] = "('',-1)"
                 print(
-                    'FAILED to get helpers.parameter `active_experiments`: '
+                    "FAILED to get helpers.parameter `active_experiments`: "
                     "not enough privileges to `ab` schema. Set value `('',-1)`."
                 )
             else:
                 raise e
 
-    parameters['youla_packages'] = (
+    parameters["youla_packages"] = (
         olap.read(
             """
         select groupUniqArray(package_id)
@@ -107,12 +107,12 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
     """
         )
         .iloc[0, 0]
-        .strip('[]')
+        .strip("[]")
     )
-    if not parameters['youla_packages']:
-        raise TableRunError('youla_packages is empty')
+    if not parameters["youla_packages"]:
+        raise TableRunError("youla_packages is empty")
 
-    parameters['audio_packages'] = (
+    parameters["audio_packages"] = (
         olap.read(
             """
         select groupUniqArray(package_id)
@@ -121,10 +121,10 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
     """
         )
         .iloc[0, 0]
-        .strip('[]')
+        .strip("[]")
     )
 
-    parameters['dsp_packages'] = (
+    parameters["dsp_packages"] = (
         olap.read(
             """
         select groupUniqArray(package_id)
@@ -133,10 +133,10 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
     """
         )
         .iloc[0, 0]
-        .strip('[]')
+        .strip("[]")
     )
 
-    parameters['dooh_packages'] = (
+    parameters["dooh_packages"] = (
         olap.read(
             """
         select groupUniqArray(package_id)
@@ -145,10 +145,10 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
     """
         )
         .iloc[0, 0]
-        .strip('[]')
+        .strip("[]")
     )
 
-    parameters['delivery_packages'] = (
+    parameters["delivery_packages"] = (
         olap.read(
             """
         select groupUniqArray(package_id)
@@ -157,10 +157,10 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
     """
         )
         .iloc[0, 0]
-        .strip('[]')
+        .strip("[]")
     )
 
-    parameters['other_packages'] = (
+    parameters["other_packages"] = (
         olap.read(
             """
         select groupUniqArray(package_id)
@@ -169,10 +169,10 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
     """
         )
         .iloc[0, 0]
-        .strip('[]')
+        .strip("[]")
     )
 
-    parameters['cpm_packages'] = (
+    parameters["cpm_packages"] = (
         olap.read(
             """
         select groupUniqArray(package_id)
@@ -181,10 +181,10 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
     """
         )
         .iloc[0, 0]
-        .strip('[]')
+        .strip("[]")
     )
 
-    parameters['dzen_banner_ids'] = (
+    parameters["dzen_banner_ids"] = (
         olap.read(
             """
         select groupUniqArray(banner_id)
@@ -193,10 +193,10 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
     """
         )
         .iloc[0, 0]
-        .strip('[]')
+        .strip("[]")
     )
 
-    parameters['dzen_pad_ids'] = (
+    parameters["dzen_pad_ids"] = (
         olap.read(
             """
         select groupUniqArray(pad_id)
@@ -205,7 +205,7 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
     """
         )
         .iloc[0, 0]
-        .strip('[]')
+        .strip("[]")
     )
 
     instream_packages = [
@@ -267,18 +267,18 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
         1898,
         1902,  # https://jira.vk.team/browse/TRG-53959
     ]
-    parameters['instream_packages'] = ','.join([str(e) for e in instream_packages])
+    parameters["instream_packages"] = ",".join([str(e) for e in instream_packages])
 
-    parameters['pad_project'] = (Filesystem.read_misc_query('pad_project')).strip('\t\n ')
-    parameters['ios_mobile_app_re'] = r'id\\d{5,}$'
+    parameters["pad_project"] = (Filesystem.read_misc_query("pad_project")).strip("\t\n ")
+    parameters["ios_mobile_app_re"] = r"id\\d{5,}$"
 
-    parameters['total_chunks'] = '{total_chunks}'
-    parameters['chunk'] = '{chunk}'
-    parameters['chunksize'] = '{chunksize}'
+    parameters["total_chunks"] = "{total_chunks}"
+    parameters["chunk"] = "{chunk}"
+    parameters["chunksize"] = "{chunksize}"
 
-    parameters['curly_braces'] = '{}'
-    parameters['left_cb'] = '{'
-    parameters['right_cb'] = '}'
+    parameters["curly_braces"] = "{}"
+    parameters["left_cb"] = "{"
+    parameters["right_cb"] = "}"
 
     advertiser_id = [
         4819958,
@@ -309,7 +309,7 @@ def query_parameters(date: Optional[Union[dt.date, str]] = None) -> Dict[str, st
         11501852,
         9437782,
     ]
-    parameters['advertiser_id'] = ','.join([str(e) for e in advertiser_id])
+    parameters["advertiser_id"] = ",".join([str(e) for e in advertiser_id])
 
     return parameters
 
@@ -318,9 +318,9 @@ def to_start_of_interval(date: Union[dt.date, str], interval: str) -> dt.date:
     if isinstance(date, str):
         date = dt.date.fromisoformat(date)
 
-    if interval == 'month':
+    if interval == "month":
         date = date.replace(day=1)
-    elif interval == 'week':
+    elif interval == "week":
         date -= dt.timedelta(days=date.weekday())
     else:
         raise ValueError(f'Unknown interval: "{interval}"')

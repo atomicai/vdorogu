@@ -25,7 +25,7 @@ class Checker:
         self._setup_logging()
 
     def __repr__(self):
-        name = "Checkers:\n" + '\n'.join(str(checker) for checker in self.checker_pool)
+        name = "Checkers:\n" + "\n".join(str(checker) for checker in self.checker_pool)
         return name
 
     def _setup_logging(self) -> None:
@@ -59,14 +59,14 @@ class Checker:
             result = checker.run(date)
             if not result:
                 failed_checkers.append(checker)
-            logger.info('\n')
+            logger.info("\n")
         self._save_checker_status(date, failed_checkers)
         if failed_checkers == []:
-            logger.info('Check is successfull')
+            logger.info("Check is successfull")
             return
         else:
             failed_checkers = [str(checker) for checker in failed_checkers]
-            raise CheckerFailedError("Failed checkers:\n{}".format('\n'.join((failed_checkers))))
+            raise CheckerFailedError("Failed checkers:\n{}".format("\n".join((failed_checkers))))
 
     def _get_checker_pool(self):
         checker_pool = []
@@ -80,24 +80,24 @@ class Checker:
         return checker_pool
 
     def _data_presence_checker(self):
-        if not self.table_parameters['allow_zero'] and not self.table_filesystem_representation.is_sensor():
+        if not self.table_parameters["allow_zero"] and not self.table_filesystem_representation.is_sensor():
             return DataPresenceChecker(self.table_name)
 
     def _dump_size_checker(self):
-        if self.table_filesystem_representation.get_type() in ('dump', 'dump-full'):
-            if not self.table_parameters['as_file']:
-                source = self.table_parameters['source']
+        if self.table_filesystem_representation.get_type() in ("dump", "dump-full"):
+            if not self.table_parameters["as_file"]:
+                source = self.table_parameters["source"]
                 source_is_foreign_table = (
-                    source in Filesystem.all_tables() and TableInFilesystem(source).get_ddl_type() == 'foreign_table'
+                    source in Filesystem.all_tables() and TableInFilesystem(source).get_ddl_type() == "foreign_table"
                 )
                 if not source_is_foreign_table:
                     source_db = self.table_filesystem_representation.get_source_db()
                     return ComparisonChecker(
                         self.table_name,
-                        metric='count(*)',
+                        metric="count(*)",
                         source_table_name=source,
                         source_db=source_db,
-                        checker_name='dump_size',
+                        checker_name="dump_size",
                     )
 
     def _custom_checkers(self):
@@ -122,17 +122,17 @@ class Checker:
         return date
 
     def _correct_date(self, date):
-        is_full = self.table_parameters['is_full']
-        datelag = self.table_parameters['datelag']
+        is_full = self.table_parameters["is_full"]
+        datelag = self.table_parameters["datelag"]
         if is_full:
             date += dt.timedelta(days=1)
         date -= dt.timedelta(days=datelag)
         return date
 
     def _save_checker_status(self, date, failed_checkers):
-        is_full = self.table_parameters['is_full']
+        is_full = self.table_parameters["is_full"]
         if is_full:
-            date = '1970-01-01'
+            date = "1970-01-01"
         error = len(failed_checkers) > 0
         check_time = dt.datetime.now()
         check_time = check_time - dt.timedelta(microseconds=check_time.microsecond)
@@ -146,18 +146,17 @@ class Checker:
                 user=[getpass.getuser()],
             )
         )
-        olap = Clickhouse('olap')
+        olap = Clickhouse("olap")
         try:
             olap.execute(
-                "alter table dwh.checker_status "
-                "delete where table_name = '{table_name}' and date = '{date}'".format(
+                "alter table dwh.checker_status delete where table_name = '{table_name}' and date = '{date}'".format(
                     table_name=self.table_name.replace(r"'", r"\'"),
                     date=date,
                 )
             )
-            olap.insert('dwh.checker_status', log_info, return_rownum=False)
+            olap.insert("dwh.checker_status", log_info, return_rownum=False)
         except ClickhouseError as e:
-            if 'Not enough privileges' in str(e):
-                logger.error('FAILED to save checker result: not enough privileges')
+            if "Not enough privileges" in str(e):
+                logger.error("FAILED to save checker result: not enough privileges")
             else:
                 raise e

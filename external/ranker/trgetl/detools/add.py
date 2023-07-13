@@ -15,7 +15,7 @@ def autodoc_paragraph(*paragraphs, after: str, tables: list = None):
         tables = documentation.all_tables()
 
     for table_name in tqdm(tables):
-        print(f'{table_name} starting')
+        print(f"{table_name} starting")
 
         update = True
         table_doc = TableInDocumentation(table_name)
@@ -28,16 +28,14 @@ def autodoc_paragraph(*paragraphs, after: str, tables: list = None):
             elif isinstance(paragraph, BeautifulSoup):
                 new_tag = paragraph
             else:
-                raise TypeError(
-                    'paragraphs should be either strings or beautiful soup objects, ' f'{type(paragraph)} found'
-                )
+                raise TypeError(f"paragraphs should be either strings or beautiful soup objects, {type(paragraph)} found")
 
             tag = (list(new_tag.children)[0]).name
-            classes = (list(new_tag.children)[0]).attrs['class']
+            classes = (list(new_tag.children)[0]).attrs["class"]
             classes.insert(0, tag)
-            element = '.'.join(classes)
+            element = ".".join(classes)
             if len(content.select(element)) > 0:
-                print(f'WARNING: element {element} already in {table_name}; passing')
+                print(f"WARNING: element {element} already in {table_name}; passing")
                 update = False
 
             tag_to_insert_after.insert_after(new_tag)
@@ -47,7 +45,7 @@ def autodoc_paragraph(*paragraphs, after: str, tables: list = None):
         else:
             tables_not_updated.append(table_name)
 
-        print(f'{table_name} done')
+        print(f"{table_name} done")
 
-    print(f'NOT UPDATED: {len(tables_not_updated)}')
+    print(f"NOT UPDATED: {len(tables_not_updated)}")
     return tables_not_updated

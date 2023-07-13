@@ -12,8 +12,8 @@ from .table_in_fs import TableInFilesystem
 
 
 class DependencyGraph:
-    DEFAULT_PATH = REPO_PATH / 'dags' / 'trgetl-dependency-graph-metadata.json'
-    REFRESH_DATETIME_NODE = '__refresh_datetime__'
+    DEFAULT_PATH = REPO_PATH / "dags" / "trgetl-dependency-graph-metadata.json"
+    REFRESH_DATETIME_NODE = "__refresh_datetime__"
 
     @property
     def graph(self):
@@ -57,7 +57,7 @@ class DependencyGraph:
         predecessors = self._recursive_successors_or_predesessors(
             table_name,
             depth_left=depth_limit,
-            method='predecessors',
+            method="predecessors",
         )
         if not tree:
             predecessors = (predecessor for group in predecessors.values() for predecessor in group)
@@ -68,7 +68,7 @@ class DependencyGraph:
         successors = self._recursive_successors_or_predesessors(
             table_name,
             depth_left=depth_limit,
-            method='successors',
+            method="successors",
         )
         if not tree:
             successors = (successor for group in successors.values() for successor in group)
@@ -84,8 +84,8 @@ class DependencyGraph:
         predecessors = self.predecessors(table_name, depth_limit=predecessor_depth_limit, tree=True)
         successors = self.successors(table_name, depth_limit=successors_depth_limit, tree=True)
 
-        table_links_graph = graphviz.Digraph(format='png', graph_attr={'rankdir': 'LR'})
-        table_links_graph.node(table_name, fillcolor='lightcoral', style='filled')
+        table_links_graph = graphviz.Digraph(format="png", graph_attr={"rankdir": "LR"})
+        table_links_graph.node(table_name, fillcolor="lightcoral", style="filled")
 
         for successor, predecessor_group in predecessors.items():
             for predecessor in predecessor_group:
@@ -115,7 +115,7 @@ class DependencyGraph:
             graph = json_graph.node_link_graph(cache)
             return graph
         else:
-            print('DependencyGraph Сache does not exist\n' 'DependencyGraph.refresh() is highly recomended')
+            print("DependencyGraph Сache does not exist\nDependencyGraph.refresh() is highly recomended")
             return None
 
     def _write_graph_to_cache(self, graph):
@@ -123,11 +123,11 @@ class DependencyGraph:
         self.cache_path.write_text(json.dumps(cache))
 
     def _alert_graph_expiration(self, graph):
-        refresh_datetime = graph.nodes[self.REFRESH_DATETIME_NODE]['time']
+        refresh_datetime = graph.nodes[self.REFRESH_DATETIME_NODE]["time"]
         refresh_datetime = dt.datetime.fromisoformat(refresh_datetime)
         refresh_age = dt.datetime.now() - refresh_datetime
         if refresh_age > self.refresh_delay:
-            print(f'DependencyGraph is expired ({refresh_age})\n' 'DependencyGraph.refresh() is advised')
+            print(f"DependencyGraph is expired ({refresh_age})\nDependencyGraph.refresh() is advised")
 
     def _is_jupyter(self):
         try:
@@ -136,7 +136,7 @@ class DependencyGraph:
         except NameError:
             return False
 
-    def _recursive_successors_or_predesessors(self, table_name, depth_left, method='successors'):
+    def _recursive_successors_or_predesessors(self, table_name, depth_left, method="successors"):
         method_callable = getattr(self.graph, method)
         successors = {table_name: list(method_callable(table_name))}
         if depth_left > 1:

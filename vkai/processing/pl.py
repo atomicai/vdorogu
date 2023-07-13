@@ -1,5 +1,6 @@
-import polars as pl
 from typing import List
+
+import polars as pl
 
 
 def _pl_project(db: pl.DataFrame, plane: pl.DataFrame, on: str, how: str = "inner"):
