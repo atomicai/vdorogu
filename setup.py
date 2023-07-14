@@ -5,7 +5,7 @@ import setuptools
 from setuptools import setup
 
 extras_require = dict(
-    format=["isort==5.12.0", "black==23.1.0"],
+    format=["isort==5.12.0", "black==22.3.0"],
     test=[
         "pytest",
         "pytest-sugar",  # For nicer look and feel
@@ -21,7 +21,7 @@ extras_require["dev"] = sum((extras_require[k] for k in ["format", "test"]), [])
 extras_require["all"] = sum(extras_require.values(), [])
 
 setup(
-    name="vdorogu",
+    name="vkai",
     version="1.0.0",
     install_requires=list(map(str, pkg_resources.parse_requirements(open("requirements.txt")))),
     extras_require=extras_require,
