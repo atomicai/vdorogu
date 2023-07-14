@@ -1,13 +1,9 @@
 import os
 import sys
 
-import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.nn import LayerNorm as BertLayerNorm
-from torch.nn.functional import gelu
-from torch.nn.utils.rnn import pack_padded_sequence, pad_packed_sequence, pad_sequence
 
 # from transformers.models.roberta.modeling_roberta import create_position_ids_from_input_ids
 # from transformers.models.bert.modeling_bert import BertEmbeddings
@@ -28,7 +24,6 @@ from transformers import (
     RobertaModel,
     RobertaTokenizer,
     XLMRobertaConfig,
-    XLMRobertaForMaskedLM,
     XLMRobertaModel,
     XLMRobertaTokenizer,
     XLNetConfig,

@@ -1,6 +1,5 @@
 import os
 
-import onnx
 import onnxruntime as ort
 
 from vdorogu.inferencer.inference import *

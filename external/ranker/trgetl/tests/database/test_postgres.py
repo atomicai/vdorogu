@@ -1,7 +1,7 @@
 import pandas as pd
 
-from ...database.postgres import Postgres, PostgresError
-from ..fixture import pg_temp_table_name, temp_table_df, temp_table_values
+from ...database.postgres import Postgres
+from ..fixture import temp_table_df, temp_table_values
 
 
 def test_pg_read():

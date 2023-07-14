@@ -1,7 +1,7 @@
 import numpy as np
 
 from vdorogu.inferencer.inference import Inferencer, add_args, gzip, sys
-from vdorogu.nn_component.metric.ir_metrics import test_auc, test_model
+from vdorogu.nn_component.metric.ir_metrics import test_model
 
 
 def get_groups(column):

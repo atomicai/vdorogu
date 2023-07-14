@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 import numpy as np
 import torch
-from transformers import AutoTokenizer, BertTokenizer, RobertaTokenizer
+from transformers import AutoTokenizer, BertTokenizer
 
 from external.ranker.dataset.web import bert_concat, valid_collate, valid_collate_dssm
 from external.ranker.inferencer.base_container import Container, match_arcifact_path

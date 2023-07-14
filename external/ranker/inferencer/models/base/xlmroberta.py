@@ -1,5 +1,3 @@
-import numpy as np
-import torch
 from transformers import AutoTokenizer, XLMRobertaConfig, XLMRobertaForSequenceClassification
 
 from vdorogu.dataset.web import bert_concat, valid_collate

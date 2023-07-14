@@ -1,8 +1,7 @@
 import sys
 
 import torch
-import transformers
-from transformers import XLMRobertaConfig, XLMRobertaForMaskedLM, XLMRobertaModel
+from transformers import XLMRobertaConfig, XLMRobertaModel
 from transformers.models.bert.modeling_bert import (
     BaseModelOutputWithPoolingAndCrossAttentions,
     BertEncoder,

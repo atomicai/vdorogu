@@ -25,10 +25,7 @@ sc = SparkContext(conf=conf)
 spark = SQLContext(sc)
 
 
-import pyspark.sql.functions as F
-import pyspark.sql.types as T
 from pyspark.sql import SparkSession
-from pyspark.sql.window import Window
 
 spark = SparkSession.builder.getOrCreate()
 sc = spark.sparkContext

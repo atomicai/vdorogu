@@ -1,4 +1,3 @@
-from external.ranker.inferencer.base_container import match_arcifact_path
 from external.ranker.inferencer.models.base.bert_dssm import RuBertTiny2DSSMContrainer
 
 

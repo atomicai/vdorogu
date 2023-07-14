@@ -2,7 +2,6 @@ import pytest
 import requests
 
 from ...database import Clickhouse
-from .fixture import auth
 
 ch_urls = list(Clickhouse.DB_URLS.values())
 

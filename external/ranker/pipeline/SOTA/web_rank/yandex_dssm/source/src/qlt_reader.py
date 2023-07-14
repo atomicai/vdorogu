@@ -1,5 +1,4 @@
 import ctypes
-import itertools
 import logging
 import os
 from ctypes import cdll

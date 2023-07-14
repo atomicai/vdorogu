@@ -1,17 +1,15 @@
-import gc
 import gzip
 import json
 import os
 import pickle
 import random
 import unicodedata
-from itertools import chain
 
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, Dataset, IterableDataset, Sampler
+from torch.utils.data import Dataset, IterableDataset
 
-from external.ranker.dataset.web import bert_concat, t5_concat
+from external.ranker.dataset.web import bert_concat
 from external.ranker.nn_component.model.nlp.parade import get_indexer
 
 

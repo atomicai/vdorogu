@@ -3,7 +3,6 @@ import numpy as np
 from bertopic.backend import BaseEmbedder
 
 from external.ranker.modeling.mask import IInferencerMask
-from external.ranker.tooling import flatten_list
 
 
 class M1Model(BaseEmbedder):

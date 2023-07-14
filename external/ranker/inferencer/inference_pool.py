@@ -2,7 +2,7 @@ import copy
 from functools import partial
 
 import torch.multiprocessing as mp
-from torch.multiprocessing import Pool, set_start_method
+from torch.multiprocessing import Pool
 
 from vdorogu.inferencer.inference import *
 

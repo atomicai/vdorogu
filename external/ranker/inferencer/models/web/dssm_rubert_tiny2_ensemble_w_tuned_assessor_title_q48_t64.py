@@ -1,4 +1,3 @@
-from vdorogu.inferencer.base_container import match_arcifact_path
 from vdorogu.inferencer.models.base.bert_dssm import RuBertTiny2DSSMContrainer
 
 
