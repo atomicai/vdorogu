@@ -1,4 +1,4 @@
-<img src="/Users/zaeleillaep/IProject/vdorogu/asset/asset-intro-pure.png" alt="asset-intro-pure" style="zoom:67%;" />
+![img](./asset/asset-intro-pure.png)
 
 ### Обзор
 
