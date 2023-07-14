@@ -24,9 +24,9 @@ class ConfluenceConnector(object):
     SLEEP_TIME = 0.5
     RETRY_COUNT = 5
     CONTENT_TYPES = {"editor", "view", "export_view", "styled_view", "storage", "anonymous_export_view"}
-    __BASE_URL = 'https://confluence.vk.team/rest/api/content'
-    __URL_BY_PAGE_ID = 'https://confluence.vk.team/pages/viewpage.action?pageId={}'
-    __LIMIT = '500'
+    __BASE_URL = "https://confluence.vk.team/rest/api/content"
+    __URL_BY_PAGE_ID = "https://confluence.vk.team/pages/viewpage.action?pageId={}"
+    __LIMIT = "500"
     TIMEZONE = dateutil.tz.tzlocal()
 
     def __init__(self, login, password, http_proxy=None, https_proxy=None, space_key=None, alert_users=True):
@@ -43,8 +43,8 @@ class ConfluenceConnector(object):
         self.space_key = space_key
         self.proxies = (
             {
-                'http': http_proxy,
-                'https': https_proxy,
+                "http": http_proxy,
+                "https": https_proxy,
             }
             if http_proxy and https_proxy
             else None
@@ -73,8 +73,8 @@ class ConfluenceConnector(object):
         if path:
             url += path
         if params:
-            url += '?{}'.format(urlencode(params))
-        logger.info('request get to {}'.format(url))
+            url += "?{}".format(urlencode(params))
+        logger.info("request get to {}".format(url))
 
         # получаем ответ на запрос или валимся по exception
         try:
@@ -88,11 +88,11 @@ class ConfluenceConnector(object):
         if response.status_code == 501:
             # noinspection PyBroadException
             try:
-                msg = response.json()['message']
+                msg = response.json()["message"]
             except Exception:
-                msg = ''
+                msg = ""
 
-            if msg and msg.endswith('Refreshing the page should fix this.'):
+            if msg and msg.endswith("Refreshing the page should fix this."):
                 raise ConfluenceUnableToSaveChangesError(msg)
 
         if not response.ok:
@@ -109,7 +109,7 @@ class ConfluenceConnector(object):
         :return: response in the JSON format
         :rtype: dict(Any)
         """
-        return self.__make_request('get', path=path, params=params).json()
+        return self.__make_request("get", path=path, params=params).json()
 
     def __make_post(self, data):
         """Prepare a POST request.
@@ -119,7 +119,7 @@ class ConfluenceConnector(object):
         :return: response in the JSON format
         :rtype: dict(Any)
         """
-        return self.__make_request('post', data=data).json()
+        return self.__make_request("post", data=data).json()
 
     def __make_put(self, path, data):
         """Prepare a PUT request.
@@ -130,7 +130,7 @@ class ConfluenceConnector(object):
         :return: response in the JSON format
         :rtype: dict(Any)
         """
-        return self.__make_request('put', path=path, data=data).json()
+        return self.__make_request("put", path=path, data=data).json()
 
     def __make_delete(self, path):
         """Prepare a DELETE request.
@@ -138,9 +138,9 @@ class ConfluenceConnector(object):
         :param str path: the URI suffix (without query parameters)
         :return: :class:`request.Response`
         """
-        return self.__make_request('delete', path=path)
+        return self.__make_request("delete", path=path)
 
-    def __get_page(self, page_id, return_content=True, content_type='view', return_response=False):
+    def __get_page(self, page_id, return_content=True, content_type="view", return_response=False):
         """Prepare a request for getting a page.
 
         :param str page_id: a page ID
@@ -150,24 +150,24 @@ class ConfluenceConnector(object):
         :return: version, title, content (if required), and response (if required)
         :rtype: tuple(str)
         """
-        expand = 'version,body.{}'.format(content_type) if return_content else 'version'
+        expand = "version,body.{}".format(content_type) if return_content else "version"
         params = {
-            'spaceKey': self.space_key,
-            'status': 'current',
-            'expand': expand,
+            "spaceKey": self.space_key,
+            "status": "current",
+            "expand": expand,
         }
 
-        response = self.__make_get(path='/{}'.format(page_id), params=params)
-        version = response['version']['number']
-        title = response['title']
+        response = self.__make_get(path="/{}".format(page_id), params=params)
+        version = response["version"]["number"]
+        title = response["title"]
         out = [version, title]
         if return_content:
-            out.append(response['body'][content_type]['value'])
+            out.append(response["body"][content_type]["value"])
         if return_response:
             out.append(response)
         return tuple(out)
 
-    def get_page_content(self, page_id, content_type='storage'):
+    def get_page_content(self, page_id, content_type="storage"):
         """Get a page content.
 
         :param str page_id: a page ID whose content the method must return
@@ -175,7 +175,7 @@ class ConfluenceConnector(object):
         :return: the page content
         """
         assert content_type in self.CONTENT_TYPES
-        logger.info('get content page %s. Type: %s', page_id, content_type)
+        logger.info("get content page %s. Type: %s", page_id, content_type)
         return self.__get_page(page_id, return_content=True, content_type=content_type)[2]
 
     def update_page(self, page_id, new_content, check_date=False):
@@ -187,35 +187,35 @@ class ConfluenceConnector(object):
             during the current day.
         :return: None
         """
-        logger.info('update page {}'.format(page_id))
+        logger.info("update page {}".format(page_id))
         version, title, response = self.__get_page(page_id, return_content=False, return_response=True)
         if check_date:
-            str_dt = response['version']['when']
+            str_dt = response["version"]["when"]
             dt = dateutil.parser.isoparse(str_dt).astimezone(self.TIMEZONE).date()
             if dt == self.current_date() and version > 1:
-                logger.info('The page has already been updated today. Last update at %s', str_dt)
+                logger.info("The page has already been updated today. Last update at %s", str_dt)
                 return
 
-        logger.info('page {} with version {}'.format(page_id, version))
+        logger.info("page {} with version {}".format(page_id, version))
         page = {
             "id": page_id,
             "type": "page",
-            'title': title,
+            "title": title,
             "space": {"key": self.space_key},
             "version": {"number": version + 1, "minorEdit": not self.alert_users},
             "body": {"storage": {"value": new_content, "representation": "storage"}},
         }
         for i in range(1, self.RETRY_COUNT):
             try:
-                self.__make_put('/' + str(page_id), page)
+                self.__make_put("/" + str(page_id), page)
                 break
             except ConfluenceUnableToSaveChangesError:
-                logger.info('Retry update (%s)', i)
+                logger.info("Retry update (%s)", i)
                 time.sleep(self.SLEEP_TIME)
                 self.get_html(page_id)
                 time.sleep(self.SLEEP_TIME)
         else:
-            self.__make_put('/' + str(page_id), page)
+            self.__make_put("/" + str(page_id), page)
 
     def get_html(self, page_id):
         """Get a page in the HTML format.
@@ -244,7 +244,7 @@ class ConfluenceConnector(object):
         :rtype: str
         """
         logger.info(
-            'Create page {} {}'.format(title, 'as a child of {}'.format(parent_page_id) if parent_page_id else '')
+            "Create page {} {}".format(title, "as a child of {}".format(parent_page_id) if parent_page_id else "")
         )
 
         page = {
@@ -257,7 +257,7 @@ class ConfluenceConnector(object):
         if parent_page_id is not None:
             page["ancestors"] = [{"id": parent_page_id}]
 
-        return self.__make_post(page)['id']
+        return self.__make_post(page)["id"]
 
     def find_page(self, title):
         """Find the ID of a page by its title.
@@ -266,15 +266,15 @@ class ConfluenceConnector(object):
         :return: the ID of the first found page
         :rtype: str
         """
-        data = self.__make_get(params={'title': title, 'spaceKey': self.space_key})
+        data = self.__make_get(params={"title": title, "spaceKey": self.space_key})
 
-        if data['size'] == 0:
+        if data["size"] == 0:
             return
 
-        if data['size'] > 1:
-            raise ValueError('Found {} pages for title {}'.format(data['size'], title))
+        if data["size"] > 1:
+            raise ValueError("Found {} pages for title {}".format(data["size"], title))
 
-        return data['results'][0]['id']
+        return data["results"][0]["id"]
 
     def get_child_pages(self, page_id):
         """Get IDs of all pages by a given parent ID.
@@ -283,15 +283,15 @@ class ConfluenceConnector(object):
         :return: a list of page and page ID pairs
         :rtype: list(tuple(str,str))
         """
-        params = {'limit': self.__LIMIT}
+        params = {"limit": self.__LIMIT}
 
-        data = self.__make_get(path='/{}/child/page'.format(page_id), params=params)
+        data = self.__make_get(path="/{}/child/page".format(page_id), params=params)
 
-        children = [(page['id'], page['title']) for page in data["results"]]
-        while 'next' in data['_links']:
-            data = self.__make_get(path=data['_links']['next'].replace('/rest/api/content', ''))
+        children = [(page["id"], page["title"]) for page in data["results"]]
+        while "next" in data["_links"]:
+            data = self.__make_get(path=data["_links"]["next"].replace("/rest/api/content", ""))
             for page in data["results"]:
-                children.append((page['id'], page['title']))
+                children.append((page["id"], page["title"]))
 
         return children
 
@@ -302,21 +302,21 @@ class ConfluenceConnector(object):
         :return: an HTTP response
         :rtype: :class:`requests.Response`
         """
-        logger.info('Delete page: %s', page_id)
-        return self.__make_delete(path='/{}'.format(page_id))
+        logger.info("Delete page: %s", page_id)
+        return self.__make_delete(path="/{}".format(page_id))
 
-    def add_labels(self, page_id, labels, prefix='global'):
+    def add_labels(self, page_id, labels, prefix="global"):
         """Add given labels with a specified prefix to a page.
 
         :param str page_id: a page ID
         :param labels: a list of labels
         :type: tuple(str) or list(str)
         """
-        logger.info('Add labels: %s (prefix: %s) for page: %s', labels, prefix, page_id)
+        logger.info("Add labels: %s (prefix: %s) for page: %s", labels, prefix, page_id)
         if not labels:
             return
         return self.__make_request(
-            method='post', path='/{}/label'.format(page_id), data=[{'prefix': prefix, 'name': label} for label in labels]
+            method="post", path="/{}/label".format(page_id), data=[{"prefix": prefix, "name": label} for label in labels]
         )
 
     def delete_label(self, page_id, label):
@@ -327,8 +327,8 @@ class ConfluenceConnector(object):
         :return: an HTTP response
         :rtype: :class:`requests.Response`
         """
-        logger.info('Delete label: %s for page: %s', label, page_id)
-        return self.__make_delete(path='/{}/label/{}'.format(page_id, label))
+        logger.info("Delete label: %s for page: %s", label, page_id)
+        return self.__make_delete(path="/{}/label/{}".format(page_id, label))
 
     def get_labels(self, page_id):
         """Get all labels in a page.
@@ -337,15 +337,15 @@ class ConfluenceConnector(object):
         :return: a list of labels
         :rtype: list(str)
         """
-        logger.info('Get labels for page: %s', page_id)
-        params = {'limit': self.__LIMIT}
+        logger.info("Get labels for page: %s", page_id)
+        params = {"limit": self.__LIMIT}
 
-        data = self.__make_get(path='/{}/label'.format(page_id), params=params)
+        data = self.__make_get(path="/{}/label".format(page_id), params=params)
 
-        labels = [label['name'] for label in data["results"]]
-        while 'next' in data['_links']:
-            data = self.__make_get(path=data['_links']['next'].replace('/rest/api/content', ''))
-            labels.extend([label['name'] for label in data["results"]])
+        labels = [label["name"] for label in data["results"]]
+        while "next" in data["_links"]:
+            data = self.__make_get(path=data["_links"]["next"].replace("/rest/api/content", ""))
+            labels.extend([label["name"] for label in data["results"]])
 
         return labels
 
@@ -377,8 +377,8 @@ class ConfluenceOAuthConnector(ConfluenceConnector):
         self.space_key = space_key
         self.proxies = (
             {
-                'http': http_proxy,
-                'https': https_proxy,
+                "http": http_proxy,
+                "https": https_proxy,
             }
             if http_proxy and https_proxy
             else None
@@ -400,8 +400,8 @@ class ConfluencePATConnector(ConfluenceConnector):
         self.space_key = space_key
         self.proxies = (
             {
-                'http': http_proxy,
-                'https': https_proxy,
+                "http": http_proxy,
+                "https": https_proxy,
             }
             if http_proxy and https_proxy
             else None

@@ -8,8 +8,8 @@ from .confluence_connector import ConfluenceConnector, ConfluenceOAuthConnector,
 
 
 class Confluence:
-    DEFAULT_PROXY = 'http://rbhp-proxy.i:3128'
-    DEFAULT_SPACE = 'TRG'
+    DEFAULT_PROXY = "http://rbhp-proxy.i:3128"
+    DEFAULT_SPACE = "TRG"
 
     __object = None
 
@@ -31,7 +31,7 @@ class Confluence:
         is_pat_client = pat_token is not None
 
         if not is_oauth_client and not is_pat_client:
-            raise FilesystemError('Confluence tokens not found; pass them explisitly')
+            raise FilesystemError("Confluence tokens not found; pass them explisitly")
 
         if is_oauth_client:
             self.client: ConfluenceConnector = ConfluenceOAuthConnector(
@@ -79,7 +79,7 @@ class Confluence:
 
     @staticmethod
     def str_to_soup(html: str) -> BeautifulSoup:
-        return BeautifulSoup(html, 'html.parser')
+        return BeautifulSoup(html, "html.parser")
 
     @staticmethod
     def soup_to_df(table_html):
@@ -88,14 +88,14 @@ class Confluence:
 
     @classmethod
     def df_to_soup(cls, df, classes=None, colwidth=None, escape=True):
-        table_html = df.to_html(index=False, na_rep='', escape=escape)
+        table_html = df.to_html(index=False, na_rep="", escape=escape)
         table_soup = cls.str_to_soup(table_html)
 
         if classes:
             if isinstance(classes, str):
                 classes = [classes]
-            classes = ['fixed-table'] + classes
-        table_soup.find('table')['class'] = classes
+            classes = ["fixed-table"] + classes
+        table_soup.find("table")["class"] = classes
 
         TABLE_WIDTH = 1000
         colnum = len(df.columns)
@@ -103,9 +103,9 @@ class Confluence:
             colwidth = int(TABLE_WIDTH / colnum)
         if isinstance(colwidth, int):
             colwidth = [colwidth] * colnum
-        assert len(colwidth) == colnum, 'length of colwidth is not equal to number of columns'
+        assert len(colwidth) == colnum, "length of colwidth is not equal to number of columns"
         colwidth_html = [f'<col style="width: {width}.0px;"/>' for width in colwidth]
-        colwidth_html = '<colgroup>' + ''.join(colwidth_html) + '</colgroup>'
-        colwidth_tag = BeautifulSoup(colwidth_html, 'html.parser')
-        table_soup.find('table').insert(0, colwidth_tag)
+        colwidth_html = "<colgroup>" + "".join(colwidth_html) + "</colgroup>"
+        colwidth_tag = BeautifulSoup(colwidth_html, "html.parser")
+        table_soup.find("table").insert(0, colwidth_tag)
         return table_soup

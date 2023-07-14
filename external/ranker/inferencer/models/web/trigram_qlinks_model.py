@@ -79,7 +79,7 @@ class ProdModel128(ProdModel):
 
 def load_trigrams(fname):
     trigrams = {}
-    with open(fname, "r", encoding='utf-8') as fin:
+    with open(fname, "r", encoding="utf-8") as fin:
         for line in fin:
             num, gram = line.strip().split("\t")
             trigrams[gram] = int(num)
@@ -98,7 +98,7 @@ def tokenize(trigrams, text, max_words, max_trigrams):
 
     words = list(text.upper().split())
     if len(words) < 1:
-        words += [''] * 3
+        words += [""] * 3
 
     for w in words:
         if len(res) >= max_words:
@@ -128,8 +128,8 @@ class TrigramQlinksModelContainer(Container):
         self.trigrams_path = match_arcifact_path(hparams, "trigrams_path", "trigrams.txt")
         self.checkpoint_path = match_arcifact_path(hparams, "checkpoint_path", "weights.pck")
 
-        self.text_maxlen = hparams['text_maxlen']
-        self.words_maxlen = hparams['words_maxlen']
+        self.text_maxlen = hparams["text_maxlen"]
+        self.words_maxlen = hparams["words_maxlen"]
 
     def sample_input(self):
         if self.mode == "scores":
@@ -191,15 +191,15 @@ class TrigramQlinksModelContainer(Container):
         q_emb = self.model.forward_half(q)
         d_emb = self.model.forward_half(d)
 
-        log.append(('q_emb_unnormed', q_emb))
-        log.append(('d_emb_unnormed', d_emb))
+        log.append(("q_emb_unnormed", q_emb))
+        log.append(("d_emb_unnormed", d_emb))
 
         query_emb = norm(q_emb)
         title_emb = norm(d_emb)
 
         res = dot(query_emb, title_emb)
 
-        log.append(('res', res))
+        log.append(("res", res))
 
         return OrderedDict(log)
 

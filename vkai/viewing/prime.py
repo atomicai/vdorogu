@@ -7,7 +7,7 @@ def plot(xs, ys, using: str = "bar", title="Y"):
     else:
         fig = px.line(x=xs, y=ys)
     fig.update_layout(
-        title=dict(text=title, font=dict(size=14), automargin=False, yref='paper'), xaxis={'type': 'category'}
+        title=dict(text=title, font=dict(size=14), automargin=False, yref="paper"), xaxis={"type": "category"}
     )
     fig.update_layout(yaxis_title=None)
     fig.update_layout(xaxis_title=None)

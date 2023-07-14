@@ -13,8 +13,8 @@ class BaseDatabase:
     DB_TITLES: Dict[str, str] = {}
     RETRY_ERRORS: Dict[str, str] = {}
 
-    db = ''
-    name = ''
+    db = ""
+    name = ""
     retries = 0
     retry_sleep = 0
 
@@ -76,10 +76,10 @@ class BaseDatabase:
     def truncate(self, table_name: str) -> int:
         raise NotImplementedError
 
-    def delete(self, table_name: str, date: Optional[dt.date], date_column: str = 'date') -> int:
+    def delete(self, table_name: str, date: Optional[dt.date], date_column: str = "date") -> int:
         raise NotImplementedError
 
-    def get_table_rownum(self, table_name: str, date: Union[dt.date, str] = None, date_column: str = 'date') -> int:
+    def get_table_rownum(self, table_name: str, date: Union[dt.date, str] = None, date_column: str = "date") -> int:
         raise NotImplementedError
 
     def default_path(self) -> Path:
@@ -92,7 +92,7 @@ class BaseDatabase:
         self,
         query: str,
         path: Optional[Union[str, Path]] = None,
-        format_: str = 'orc',
+        format_: str = "orc",
         appname: Optional[str] = None,
         return_structure: bool = False,
     ) -> Optional[list]:
@@ -121,7 +121,7 @@ def retry(function: Callable) -> Callable:
                 if retries and retry_errors_occured:
                     execution_time = round(time.time() - start_time)
                     retries -= 1
-                    print(f'{execution_time} sec: {retry_errors_occured[0]}, retrying...')
+                    print(f"{execution_time} sec: {retry_errors_occured[0]}, retrying...")
                     time.sleep(self.retry_sleep)
                 else:
                     raise e
@@ -136,9 +136,9 @@ def measure(function: Callable) -> Callable:
         result = function(self, *args, **kwargs)
         execution_time = round(time.time() - start_time)
         size_gb = round(sys.getsizeof(result) / 2**30, 1)
-        measure_report = f'{function.__name__}: {execution_time} sec'
+        measure_report = f"{function.__name__}: {execution_time} sec"
         if size_gb >= 0.1:
-            measure_report += f', {size_gb} Gb'
+            measure_report += f", {size_gb} Gb"
         print(measure_report)
         return result
 

@@ -200,7 +200,7 @@ class Bert(nn.Module):
     def __init__(self, model_class, model_path, config_path=None, pretrained=True, output_size=1):
         super().__init__()
         if config_path is None:
-            config_path = os.path.join(model_path, 'config.json')
+            config_path = os.path.join(model_path, "config.json")
 
         # self.conf = MODEL_CLASSES[model_class][0].from_pretrained(config_path)
         self.conf = MODEL_CLASSES[model_class][0].from_pretrained(model_path)
@@ -229,9 +229,9 @@ class Bert(nn.Module):
 
 
 class BertLargeDSSM(BertDSSM):
-    '''
+    """
     DSSM with complex projection layers
-    '''
+    """
 
     def __init__(self, config_path, proj_size=64, n_head=1):
         super().__init__(config_path=config_path)

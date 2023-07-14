@@ -1,6 +1,6 @@
 import numpy as np
 
-from vdorogu.inferencer.inference import *
+from vdorogu.inferencer.inference import Inferencer, add_args, gzip, sys
 from vdorogu.nn_component.metric.ir_metrics import test_auc, test_model
 
 
@@ -19,8 +19,8 @@ def get_groups(column):
 
 def add_special_args():
     parser = add_args()
-    parser.add_argument('--labels_path', type=str, default=None, help='path to labels for compute metric')
-    parser.add_argument('--metric', type=str, default=None, help='type of metric to evaluate')
+    parser.add_argument("--labels_path", type=str, default=None, help="path to labels for compute metric")
+    parser.add_argument("--metric", type=str, default=None, help="type of metric to evaluate")
 
     return parser
 
@@ -37,14 +37,14 @@ def main(hparams, model_params):
         input = sys.stdin
     else:
         if hparams.input.endswith(".gz"):
-            input = gzip.open(hparams.input, 'rt')
+            input = gzip.open(hparams.input, "rt")
         else:
-            input = open(hparams.input, 'rt')
+            input = open(hparams.input, "rt")
 
     if hparams.output == "-":
         output = sys.stdout
     else:
-        output = open(hparams.output, 'wt')
+        output = open(hparams.output, "wt")
 
     if hparams.labels_path:
         labels = np.loadtxt(hparams.labels_path)
@@ -62,7 +62,7 @@ def main(hparams, model_params):
 
     inf.stdout = output
 
-    input_texts = [line.rstrip('\n\r').split('\t') for line in input]
+    input_texts = [line.rstrip("\n\r").split("\t") for line in input]
     qids = get_groups([elem[0] for elem in input_texts])  # compute qids
     print("Num test points:", len(input_texts), file=sys.stderr)
 

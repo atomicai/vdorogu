@@ -18,28 +18,28 @@ def quantize_onnx_model(onnx_model_path, quantized_model_path):
 def get_args():
     parser = argparse.ArgumentParser(description="Inferencer for all prod models", add_help=False)
 
-    parser.add_argument('--model', type=str, help='path to model.py file')
+    parser.add_argument("--model", type=str, help="path to model.py file")
 
-    parser.add_argument('--mode', type=str, default="scores", help='variant of calculation (usually scores/embeddings)')
+    parser.add_argument("--mode", type=str, default="scores", help="variant of calculation (usually scores/embeddings)")
 
     parser.add_argument(
-        '--storage_path',
+        "--storage_path",
         type=str,
         default=None,
-        help='path to model data storage, can be altered by --{}'.format(Container.DATA_PATH_NAME),
+        help="path to model data storage, can be altered by --{}".format(Container.DATA_PATH_NAME),
     )
 
     parser.add_argument(
-        '--' + Container.DATA_PATH_NAME,
+        "--" + Container.DATA_PATH_NAME,
         type=str,
         default=None,
-        help='path to model data, usually can be automatically inferred from --storage_path',
+        help="path to model data, usually can be automatically inferred from --storage_path",
     )
 
-    parser.add_argument('--output', type=str, default='model.onnx', help='output fname')
+    parser.add_argument("--output", type=str, default="model.onnx", help="output fname")
 
     parser.add_argument(
-        '--quant', dest='quant', default=False, action='store_true', help='save quant version of onnx model'
+        "--quant", dest="quant", default=False, action="store_true", help="save quant version of onnx model"
     )
 
     args = parser.parse_args()
@@ -57,7 +57,7 @@ def main(hparams, model_params):
 
     batch, inp_names, out_names, dynamic_axes = container.sample_input()
 
-    container.model.to(torch.device('cpu'))
+    container.model.to(torch.device("cpu"))
     container.model.eval()
 
     class TracedContainer(torch.nn.Module):
@@ -95,7 +95,7 @@ def main(hparams, model_params):
     print("ok, results saved to '{}'".format(hparams.output))
 
     if hparams.quant:
-        quantized_model_path = hparams.output.replace('.onnx', '.quant.onnx')
+        quantized_model_path = hparams.output.replace(".onnx", ".quant.onnx")
         quantize_onnx_model(hparams.output, quantized_model_path)
 
         model = onnx.load_model(quantized_model_path)

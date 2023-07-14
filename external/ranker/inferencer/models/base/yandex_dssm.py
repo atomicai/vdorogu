@@ -31,7 +31,7 @@ class YandexModel(torch.nn.Module):
 
 def remove_punctuation(s):
     exclude = set(string.punctuation)
-    s = ''.join(ch for ch in s if ch not in exclude)
+    s = "".join(ch for ch in s if ch not in exclude)
     return s
 
 
@@ -44,8 +44,8 @@ class YandexDSSM(Container):
         self.hidden_dim = 256
         self.sentence_dim = 64
 
-        self.checkpoint_path = 'epoch=16-step=4045778.ckpt'
-        self.known_words_path = 'unigram_1mil.txt'
+        self.checkpoint_path = "epoch=16-step=4045778.ckpt"
+        self.known_words_path = "unigram_1mil.txt"
 
     def load(self):
         self.matcher = EuclideanMatcher()

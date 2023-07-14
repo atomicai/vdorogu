@@ -9,4 +9,4 @@ with open("input_file.txt") as fin:
         print(res)
 
 # or
-scores = inf.fields_inference([('abc', 'cde'), ('abc', 'efg')])
+scores = inf.fields_inference([("abc", "cde"), ("abc", "efg")])

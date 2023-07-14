@@ -36,15 +36,15 @@ class PoolDataset(IterableDataset):
 
 class InferencerPool(Inferencer):
     def __init__(self, **kwargs):
-        chunksize = kwargs['chunksize']
-        cpu_count = kwargs['cpu_count']
+        chunksize = kwargs["chunksize"]
+        cpu_count = kwargs["cpu_count"]
 
-        del kwargs['chunksize']
-        del kwargs['cpu_count']
+        del kwargs["chunksize"]
+        del kwargs["cpu_count"]
 
         super().__init__(**kwargs)
 
-        if cpu_count == 'all':
+        if cpu_count == "all":
             self.cpu_count = mp.cpu_count() // 2
         else:
             self.cpu_count = int(cpu_count)
@@ -64,10 +64,10 @@ class InferencerPool(Inferencer):
         parser = argparse.ArgumentParser(parents=[parent_parser])
 
         parser.add_argument(
-            '--cpu_count', type=str, default='1', help='number of cpu to preprocess data, also accepts "all"'
+            "--cpu_count", type=str, default="1", help='number of cpu to preprocess data, also accepts "all"'
         )
 
-        parser.add_argument('--chunksize', type=int, default=None, help='size of chunk to process by 1 worker in pool')
+        parser.add_argument("--chunksize", type=int, default=None, help="size of chunk to process by 1 worker in pool")
         return parser
 
 
@@ -89,18 +89,18 @@ def main(hparams, model_params):
         input = sys.stdin
     else:
         if hparams.input.endswith(".gz"):
-            input = gzip.open(hparams.input, 'rt')
+            input = gzip.open(hparams.input, "rt")
         else:
-            input = open(hparams.input, 'rt')
+            input = open(hparams.input, "rt")
 
     if hparams.output == "-":
         output = sys.stdout
     else:
-        output = open(hparams.output, 'wt')
+        output = open(hparams.output, "wt")
 
-    if hparams.gpus != '0' and hparams.cpu_count != '1':
+    if hparams.gpus != "0" and hparams.cpu_count != "1":
         try:
-            torch.multiprocessing.set_start_method('spawn')
+            torch.multiprocessing.set_start_method("spawn")
         except RuntimeError:
             pass
 

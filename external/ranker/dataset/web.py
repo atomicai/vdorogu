@@ -16,7 +16,7 @@ class RawTextDataset(IterableDataset):
         tokenizer,
         preprocessing,
         max_len=128,
-        separator='\t',
+        separator="\t",
         mapper=None,
         actual_fields=(0, 1, 2),
         max_len_list=None,
@@ -36,7 +36,7 @@ class RawTextDataset(IterableDataset):
         self.max_len_list = max_len_list
 
     def __iter__(self):
-        with open(self.filename, 'r') as f:
+        with open(self.filename, "r") as f:
             for line in f:
                 datum = line.strip().split(self.separator)
                 datum = np.array(datum)[np.array(self.actual_fields)]
@@ -392,9 +392,9 @@ class QueryDatasetDSSM(Dataset):
         valid_mode=False,
         dummy_label=-1000.0,
     ):
-        '''
+        """
         priority_label - the label that must be sampled
-        '''
+        """
         self.queries = queries
         self.documents = documents
         self.labels = labels
@@ -752,7 +752,7 @@ class QueryDatasetMultitargetWithNegative(Dataset):
         priority_label=None,
         is_dssm=False,
         dummy_label=-1000.0,
-        negative='default',
+        negative="default",
         min_length=3,
         token_concat_flavour=bert_concat,
         use_emb=False,
@@ -830,7 +830,7 @@ class QueryDatasetMultitargetWithNegative(Dataset):
         labels = np.array(labels)
         labels_size = self.labels.shape[1]
         if not self.priority_label:
-            if self.negative == 'half':
+            if self.negative == "half":
                 idx = np.random.permutation(len(labels))[: self.max_query // 2]
             else:
                 idx = np.random.permutation(len(labels))[: self.max_query]
@@ -859,9 +859,9 @@ class QueryDatasetMultitargetWithNegative(Dataset):
         positive_labels = [1 for i in labels]
         # negative mining
         if not self.priority_label:
-            if self.negative == 'default':
+            if self.negative == "default":
                 negatives_count = self.max_query - len(input_ids)
-            elif self.negative == 'free':
+            elif self.negative == "free":
                 negatives_count = self.max_query - len(labels)
             else:
                 negatives_count = self.max_query - len(labels)
@@ -945,7 +945,7 @@ class QueryHardNegativeDataset(Dataset):
         max_len=128,
         is_dssm=False,
         dummy_label=-1000.0,
-        negative='free',
+        negative="free",
         min_length=0,
         use_emb=False,
     ):
@@ -973,7 +973,7 @@ class QueryHardNegativeDataset(Dataset):
             tokenizer=tokenizer,
             max_query=max_negative_query,
             is_dssm=is_dssm,
-            negative='free',
+            negative="free",
             min_length=min_length,
             use_emb=use_emb,
         )

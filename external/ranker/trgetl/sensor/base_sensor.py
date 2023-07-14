@@ -36,7 +36,7 @@ class BaseSensor:
         return date
 
     def _correct_date(self, date):
-        datelag = self.parameters['datelag']
+        datelag = self.parameters["datelag"]
         date -= dt.timedelta(days=datelag)
         return date
 

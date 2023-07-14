@@ -19,7 +19,7 @@ def preprocess(text):
     text = " ".join(text.strip().split())
     text = text.replace("``", '"').replace("''", '"')
     nfkd_form = unicodedata.normalize("NFKD", text)
-    text = u"".join([c for c in nfkd_form if not unicodedata.combining(c)])
+    text = "".join([c for c in nfkd_form if not unicodedata.combining(c)])
     return text.lower()
 
 
@@ -119,15 +119,15 @@ class BodyDataset(IterableDataset):
 
                         batch = []
 
-                        query_unprocessed = data['query'][0]
+                        query_unprocessed = data["query"][0]
                         query = self.prepare_ids(query_unprocessed, self.query_maxlen)
-                        for data in data['data']:
-                            label = data['xlm_roberta_large_query64_body440']
+                        for data in data["data"]:
+                            label = data["xlm_roberta_large_query64_body440"]
 
                             if self.custom_processor is not None:
-                                query, document = self.custom_processor(self.tokenizer, query_unprocessed, data['body'])
+                                query, document = self.custom_processor(self.tokenizer, query_unprocessed, data["body"])
                             else:
-                                document = self.prepare_ids(data['body'], self.body_maxlen)
+                                document = self.prepare_ids(data["body"], self.body_maxlen)
 
                             if self.dssm_variant:
                                 batch.append((query, document, label))
@@ -238,9 +238,9 @@ class QueryDatasetDSSM(Dataset):
         mapper=None,
         priority_label=None,
     ):
-        '''
+        """
         priority_label - the label that must be sampled
-        '''
+        """
         self.queries = queries
         self.documents = documents
         self.labels = labels
@@ -336,7 +336,7 @@ class MultizoneDataset(Dataset):
         max_query_len=64,
         max_texts_len=[64],
         max_len=128,
-        fields=['titles'],
+        fields=["titles"],
         mapper=None,
         token_concat_flavour=bert_multizone_concat,
         label_count=1,
@@ -434,7 +434,7 @@ class FlatMultizoneDataset(Dataset):
         max_query_len=64,
         max_texts_len=[64],
         max_len=128,
-        fields=['titles'],
+        fields=["titles"],
         mapper=None,
         token_concat_flavour=bert_multizone_concat,
         add_rank_zone=False,
@@ -548,7 +548,7 @@ class BodyPassageDataset(Dataset):
             )
 
             document = np.pad(
-                document, (0, self.max_passage_len), 'constant', constant_values=self.tokenizer.pad_token_id
+                document, (0, self.max_passage_len), "constant", constant_values=self.tokenizer.pad_token_id
             )
 
             passage_ids = np.ones((self.max_passage, self.max_passage_len)) * self.tokenizer.pad_token_id
@@ -635,7 +635,7 @@ class FlatPassageDataset(Dataset):
 
         indexer = get_indexer(len(document), self.max_passage, self.max_passage_len, self.stride, self.passage_sampling)
 
-        document = np.pad(document, (0, self.max_passage_len), 'constant', constant_values=self.tokenizer.pad_token_id)
+        document = np.pad(document, (0, self.max_passage_len), "constant", constant_values=self.tokenizer.pad_token_id)
 
         passage_ids = np.ones((self.max_passage, self.max_passage_len)) * self.tokenizer.pad_token_id
         passage_ids[: len(indexer)] = document[indexer]
@@ -693,7 +693,7 @@ class BodyPassageDatasetDSSM(Dataset):
         self.stride = stride
         self.passage_sampling = passage_sampling
 
-        self.passage_ids = np.ones((self.max_passage, self.max_passage_len - 2)).astype('int')
+        self.passage_ids = np.ones((self.max_passage, self.max_passage_len - 2)).astype("int")
         self.passage_ids.fill(self.tokenizer.pad_token_id)
 
     def __len__(self):
@@ -815,9 +815,9 @@ class BodyParadeDataset(IterableDataset):
         else:
             files = sorted(
                 [
-                    os.path.join(train_dataset, p, 'data.pck')
+                    os.path.join(train_dataset, p, "data.pck")
                     for p in os.listdir(train_dataset)
-                    if not p.endswith(".pck") and p.startswith('train')
+                    if not p.endswith(".pck") and p.startswith("train")
                 ]
             )
 
@@ -883,25 +883,25 @@ class BodyParadeDataset(IterableDataset):
             for fname in self.fnames:
                 if self.dssm_variant:
                     print(worker_id, fname)
-                    with open(os.path.join(fname, 'data.pck'), 'rb') as f:
+                    with open(os.path.join(fname, "data.pck"), "rb") as f:
                         train = pickle.load(f)
 
                     if self.distill_path:
-                        if self.distill_path == 'serps':
-                            print('Use serps labels')
-                            labels = train['labels'].flatten()
+                        if self.distill_path == "serps":
+                            print("Use serps labels")
+                            labels = train["labels"].flatten()
                             labels = (50 - labels) / 50.0
                         else:
-                            print('Read new labels')
+                            print("Read new labels")
                             labels = np.loadtxt(os.path.join(fname, self.distill_path))
                     else:
-                        labels = train['labels'].flatten()
+                        labels = train["labels"].flatten()
 
                     train_dataset = BodyPassageDatasetDSSM(
-                        train['queries'],
-                        train['bodies'],  # не забыть вернуть боди
+                        train["queries"],
+                        train["bodies"],  # не забыть вернуть боди
                         labels,
-                        train['qids'].flatten(),
+                        train["qids"].flatten(),
                         self.tokenizer,
                         self.max_query,
                         self.max_len,
@@ -912,14 +912,14 @@ class BodyParadeDataset(IterableDataset):
                         passage_sampling=self.passage_sampling,
                     )
                 else:
-                    with open(fname, 'rb') as f:
+                    with open(fname, "rb") as f:
                         train = pickle.load(f)
 
                     train_dataset = BodyPassageDataset(
-                        train['queries'],
-                        train['bodies'],
-                        train['labels'].flatten(),
-                        train['qids'].flatten(),
+                        train["queries"],
+                        train["bodies"],
+                        train["labels"].flatten(),
+                        train["qids"].flatten(),
                         self.tokenizer,
                         self.max_query,
                         self.max_len,

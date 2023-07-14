@@ -20,8 +20,8 @@ class XlmrobertaContainer(Container):
         self.config_path = match_arcifact_path(hparams, "config_path")
         self.checkpoint_path = match_arcifact_path(hparams, "checkpoint_path", "weights.pck")
 
-        self.query_maxlen = hparams['query_maxlen']
-        self.document_maxlen = hparams['document_maxlen']
+        self.query_maxlen = hparams["query_maxlen"]
+        self.document_maxlen = hparams["document_maxlen"]
 
         self.num_labels = 1
         self.pad_id = 1

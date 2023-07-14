@@ -132,7 +132,7 @@ class RankingLossListWiseDistil(nn.Module):
     def __init__(self, topn=50, smooth_fraction=0.25):
         super().__init__()
         self.topn = topn
-        self.pairwise_loss = nn.BCEWithLogitsLoss(reduction='none')
+        self.pairwise_loss = nn.BCEWithLogitsLoss(reduction="none")
         self.smooth_fraction = smooth_fraction
         self.temperature = 2.0
 

@@ -17,7 +17,7 @@ class BaseChecker:
         self.parameters = self._get_standart_parameters(**parameters)
 
     def __repr__(self):
-        name = (f"{type(self).__name__}('{self.table_name}') " + self.parameters.get('checker_name', '')).strip()
+        name = (f"{type(self).__name__}('{self.table_name}') " + self.parameters.get("checker_name", "")).strip()
         return name
 
     @classmethod

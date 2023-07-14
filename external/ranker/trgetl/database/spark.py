@@ -13,8 +13,8 @@ from pandas import DataFrame
 from .base_database import BaseDatabase
 from .hdfs import Hdfs
 
-PYSPARK_2_PATHS = ['/usr/lib/spark/python', '/usr/lib/spark/python/lib/py4j-current-src.zip']
-PYSPARK_3_PATHS = ['/usr/lib/spark3/python', '/usr/lib/spark3/python/lib/py4j-current-src.zip']
+PYSPARK_2_PATHS = ["/usr/lib/spark/python", "/usr/lib/spark/python/lib/py4j-current-src.zip"]
+PYSPARK_3_PATHS = ["/usr/lib/spark3/python", "/usr/lib/spark3/python/lib/py4j-current-src.zip"]
 
 for pyspark_2_path in PYSPARK_2_PATHS:
     if pyspark_2_path in sys.path:
@@ -36,9 +36,9 @@ from pyspark.sql import SparkSession  # noqa: E402
 
 
 class Spark(BaseDatabase):
-    SYSTEM_USERS = ['airflow-trgetl', 'jenkins-trgan']
+    SYSTEM_USERS = ["airflow-trgetl", "jenkins-trgan"]
 
-    def __init__(self, db: str = '', keep_session: bool = True, shuffle_partitions: int = 200, conf: dict = dict()):
+    def __init__(self, db: str = "", keep_session: bool = True, shuffle_partitions: int = 200, conf: dict = dict()):
         self.db = db
         self.hdfs = Hdfs()
 
@@ -72,7 +72,7 @@ class Spark(BaseDatabase):
         self,
         query: str,
         path: Optional[Union[str, Path]] = None,
-        format_: str = 'orc',
+        format_: str = "orc",
         appname: Optional[str] = None,
         return_structure: bool = False,
     ) -> Optional[list]:
@@ -80,10 +80,10 @@ class Spark(BaseDatabase):
             path = self.default_path() / str(dt.datetime.now())
         with self.spark_session(appname=appname) as session:
             df = session.sql(query)
-            print('Query executed')
+            print("Query executed")
             write = getattr(df.write, format_)
             write(str(path))
-            print(f'File saved at {path}')
+            print(f"File saved at {path}")
             if return_structure:
                 return df.dtypes
         return None
@@ -93,7 +93,7 @@ class Spark(BaseDatabase):
         # if username in self.SYSTEM_USERS:
         #     return Path('/export/target')
         # else:
-        return Path('/data/sandbox/trgetl')
+        return Path("/data/sandbox/trgetl")
 
     def insert(  # type: ignore
         self,
@@ -101,7 +101,7 @@ class Spark(BaseDatabase):
         df: DataFrame,
         as_table: bool = False,
         mode: Optional[str] = None,
-        format: str = 'csv',
+        format: str = "csv",
         appname: Optional[str] = None,
         **options: Hashable,
     ) -> None:
@@ -122,10 +122,10 @@ class Spark(BaseDatabase):
         return self.hdfs.rm(path=path)
 
     def columns(self, table_name: str, return_dtypes: bool = False) -> list:
-        columns = self.read(f'describe table {table_name}')
+        columns = self.read(f"describe table {table_name}")
         columns = (
-            columns.rename(columns={'col_name': 'name', 'date_type': 'type'})
-            .query("name.str.startswith('#') == False", engine='python')
+            columns.rename(columns={"col_name": "name", "date_type": "type"})
+            .query("name.str.startswith('#') == False", engine="python")
             .drop_duplicates()
         )
         if return_dtypes:
@@ -144,20 +144,20 @@ class Spark(BaseDatabase):
         finally:
             if not self.keep_session:
                 session.stop()
-                print('Session stopped')
+                print("Session stopped")
 
     def get_session(self, appname: Optional[str] = None) -> SparkSession:
         start_time = time.time()
         conf = self._get_spark_conf(appname=appname)
         session = SparkSession.builder.config(conf=conf).getOrCreate()
 
-        print(f'Session established; {int(time.time() - start_time)} sec')
+        print(f"Session established; {int(time.time() - start_time)} sec")
         return session
 
     def stop_session(self) -> None:
         session = self.get_session()
         session.stop()
-        print('Session stopped')
+        print("Session stopped")
 
     def _get_spark_conf(self, appname: Optional[str] = None) -> SparkConf:
         username = getpass.getuser()

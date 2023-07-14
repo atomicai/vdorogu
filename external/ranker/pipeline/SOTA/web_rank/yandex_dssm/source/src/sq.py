@@ -14,8 +14,8 @@ class SQDataset(Dataset):
         queries, labels, titles, qids = [], [], [], []
         with open(path) as f:
             for line in f:
-                parts = line.strip('\n').split('\t')
-                parts.extend([''] * (4 - len(parts)))
+                parts = line.strip("\n").split("\t")
+                parts.extend([""] * (4 - len(parts)))
                 q, t, l, qid = parts
                 queries.append(q)
                 labels.append(int(l))

@@ -151,7 +151,7 @@ class AnnGaussianNegativeSampler:
         self.cache = []
 
         self.embeds = predict(self.model, self.backlog.get_data(), 1024, self.device, [64])
-        self.index = annoy.AnnoyIndex(self.embeds.shape[1], 'euclidean')
+        self.index = annoy.AnnoyIndex(self.embeds.shape[1], "euclidean")
         for i, emb in enumerate(self.embeds):
             self.index.add_item(i, emb)
         self.index.build(10)

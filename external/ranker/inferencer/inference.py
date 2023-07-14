@@ -30,7 +30,7 @@ class SimpleDataset(IterableDataset):
 
 
 def load_model(path, mode, model_params):
-    path = path.replace(osp.sep, '.')
+    path = path.replace(osp.sep, ".")
     if path.endswith(".py"):
         path = path[:-3]
 
@@ -76,12 +76,12 @@ class Inferencer:
 
         self.bs = batch_size
 
-        if gpus == 'all':
+        if gpus == "all":
             self.gpus = torch.cuda.device_count()
         else:
             self.gpus = int(gpus)
 
-        self.device = torch.device('cuda:0' if self.gpus > 0 else 'cpu')
+        self.device = torch.device("cuda:0" if self.gpus > 0 else "cpu")
         self.try_half = half
 
         if self.gpus > 1:
@@ -97,7 +97,7 @@ class Inferencer:
 
     def inference_text_realtime(self, data_generator, debug=False):
         yield from self.inference_fields_realtime(
-            (line.rstrip('\n\r').split('\t') for line in data_generator), debug=debug
+            (line.rstrip("\n\r").split("\t") for line in data_generator), debug=debug
         )
 
     def inference_fields_realtime(self, data_generator, debug=False):
@@ -112,8 +112,8 @@ class Inferencer:
         if model_data_path is None:
             assert storage_path is not None, "--model_data_path or --storage_path argument is required"
 
-            _, subpath = model.rsplit('models/', 1)
-            if subpath.endswith('.py'):
+            _, subpath = model.rsplit("models/", 1)
+            if subpath.endswith(".py"):
                 subpath = subpath[:-3]
 
             model_params[Container.DATA_PATH_NAME] = osp.join(storage_path, subpath)
@@ -129,7 +129,7 @@ class Inferencer:
             res = res.reshape(-1, 1)
 
         for row in res:
-            print('\t'.join(row.flatten().astype('str').tolist()), file=fout)
+            print("\t".join(row.flatten().astype("str").tolist()), file=fout)
 
     def move_batch_(self, batch):
         if isinstance(batch, tuple) or isinstance(batch, list):
@@ -144,14 +144,14 @@ class Inferencer:
         if self.model_prepared_:
             return
 
-        if self.try_half and self.device != torch.device('cpu'):
+        if self.try_half and self.device != torch.device("cpu"):
             try:
                 self.container.model.half()
             except Exception as e:
                 print("Warning, can't use half for this model", e)
 
-        if self.device != torch.device('cpu'):
-            self.container.optimized_for = 'gpu'
+        if self.device != torch.device("cpu"):
+            self.container.optimized_for = "gpu"
 
         self.container.model.to(self.device)
         self.container.model.eval()
@@ -187,7 +187,7 @@ class Inferencer:
                 res = res.cpu().numpy()
                 yield res
 
-        print(f'Inference step time = {round(sum(latency) * 1000 / len(latency), 2)} ms', file=sys.stderr)
+        print(f"Inference step time = {round(sum(latency) * 1000 / len(latency), 2)} ms", file=sys.stderr)
         torch.cuda.empty_cache()
         gc.collect()
 
@@ -222,31 +222,31 @@ class Inferencer:
 def add_args():
     parser = argparse.ArgumentParser(description="Inferencer for all prod models", add_help=False)
 
-    parser.add_argument('--bs', '--batch_size', type=int, default=128, help='batch size for inference')
+    parser.add_argument("--bs", "--batch_size", type=int, default=128, help="batch size for inference")
 
-    parser.add_argument('--debug', dest='debug', action='store_true', help='just print debug scores for model')
+    parser.add_argument("--debug", dest="debug", action="store_true", help="just print debug scores for model")
 
-    parser.add_argument('--input', type=str, default='-', help='input file')
+    parser.add_argument("--input", type=str, default="-", help="input file")
 
-    parser.add_argument('--output', type=str, default='-', help='output file')
+    parser.add_argument("--output", type=str, default="-", help="output file")
 
-    parser.add_argument('--model', type=str, help='path to model.py file')
+    parser.add_argument("--model", type=str, help="path to model.py file")
 
-    parser.add_argument('--mode', type=str, default="scores", help='variant of calculation (usually scores/embeddings)')
+    parser.add_argument("--mode", type=str, default="scores", help="variant of calculation (usually scores/embeddings)")
 
-    parser.add_argument('--gpus', type=str, default='0', help='number of gpus to compute, also accepts "all"')
+    parser.add_argument("--gpus", type=str, default="0", help='number of gpus to compute, also accepts "all"')
 
-    parser.add_argument('--no_half', dest='half', action='store_false', help='do not use fp16 on gpu')
+    parser.add_argument("--no_half", dest="half", action="store_false", help="do not use fp16 on gpu")
 
     parser.add_argument(
-        '--storage_path', type=str, default=None, help='path to model data storage, can be altered by --model_data_path'
+        "--storage_path", type=str, default=None, help="path to model data storage, can be altered by --model_data_path"
     )
 
     parser.add_argument(
-        '--model_data_path',
+        "--model_data_path",
         type=str,
         default=None,
-        help='path to model data, usually can be automatically inferred from --storage_path',
+        help="path to model data, usually can be automatically inferred from --storage_path",
     )
 
     parser.add_argument(
@@ -256,7 +256,7 @@ def add_args():
         action=StoreDictKeyPair,
         nargs="+",
         metavar="KEY=VAL",
-        help='model params',
+        help="model params",
     )
 
     return parser
@@ -274,14 +274,14 @@ def main(hparams, model_params):
         input = sys.stdin
     else:
         if hparams.input.endswith(".gz"):
-            input = gzip.open(hparams.input, 'rt')
+            input = gzip.open(hparams.input, "rt")
         else:
-            input = open(hparams.input, 'rt')
+            input = open(hparams.input, "rt")
 
     if hparams.output == "-":
         output = sys.stdout
     else:
-        output = open(hparams.output, 'wt')
+        output = open(hparams.output, "wt")
 
     inf = Inferencer(
         model=hparams.model,

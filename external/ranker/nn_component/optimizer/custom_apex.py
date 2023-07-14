@@ -17,7 +17,7 @@ class FusedAdamFix(FusedAdam):
         set_grad_none=True,
     ):
         if amsgrad:
-            raise RuntimeError('FusedAdam does not support the AMSGrad variant.')
+            raise RuntimeError("FusedAdam does not support the AMSGrad variant.")
         defaults = dict(lr=lr, bias_correction=bias_correction, betas=betas, eps=eps, weight_decay=weight_decay)
         super(FusedAdam, self).__init__(params, defaults)
         self.adam_w_mode = 1 if adam_w_mode else 0
@@ -30,4 +30,4 @@ class FusedAdamFix(FusedAdam):
             self._dummy_overflow_buf = torch.IntTensor([0])
             self.multi_tensor_adam = amp_C.multi_tensor_adam
         else:
-            raise RuntimeError('apex.optimizers.FusedAdam requires cuda extensions')
+            raise RuntimeError("apex.optimizers.FusedAdam requires cuda extensions")

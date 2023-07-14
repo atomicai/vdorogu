@@ -25,15 +25,15 @@ def date_range(
     table = Table(table_name)
     checker = Checker(table_name)
     if in_public:
-        new_name = 'public.' + table_name.split('.')[-1]
+        new_name = "public." + table_name.split(".")[-1]
         table.name = new_name
         checker.table_name = new_name
-    assert not table.is_full, 'date range works for not full tables'
+    assert not table.is_full, "date range works for not full tables"
 
     if isinstance(start_date, str):
-        start_date = dt.datetime.strptime(start_date, '%Y-%m-%d').date()
+        start_date = dt.datetime.strptime(start_date, "%Y-%m-%d").date()
     if isinstance(end_date, str):
-        end_date = dt.datetime.strptime(end_date, '%Y-%m-%d').date()
+        end_date = dt.datetime.strptime(end_date, "%Y-%m-%d").date()
     if start_date < end_date:
         start_date, end_date = end_date, start_date
     total_days = (start_date - end_date).days + 1
@@ -47,13 +47,13 @@ def date_range(
                 if check:
                     print()
                     checker.run(date)
-                print('\n')
+                print("\n")
                 return
             except KeyboardInterrupt as e:
                 raise e
             except Exception as e:
                 if current_retry:
-                    print(f'ERROR: {e}')
+                    print(f"ERROR: {e}")
                 else:
                     raise e
 
@@ -71,10 +71,10 @@ def date_range(
 @myteam_report
 def tables(date: Union[str, dt.date]) -> list:
     if isinstance(date, str):
-        date = dt.datetime.strptime(date, '%Y-%m-%d').date()
+        date = dt.datetime.strptime(date, "%Y-%m-%d").date()
 
     tables = DependencyGraph().all_live_tables()
-    full_tables = [tname for tname in tqdm(tables) if not getattr(Table(tname), 'is_full', False)]
+    full_tables = [tname for tname in tqdm(tables) if not getattr(Table(tname), "is_full", False)]
     to_reload = []
 
     for tname in tqdm(full_tables):
@@ -83,7 +83,7 @@ def tables(date: Union[str, dt.date]) -> list:
             checker.run(date)
         except CheckerFailedError:
             to_reload.append(tname)
-        print('\n')
+        print("\n")
 
     failed = []
     for tname in tqdm(to_reload):
@@ -94,6 +94,6 @@ def tables(date: Union[str, dt.date]) -> list:
             checker.run(date)
         except Exception:
             failed.append(tname)
-        print('\n')
+        print("\n")
 
     return failed

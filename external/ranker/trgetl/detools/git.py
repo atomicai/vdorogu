@@ -10,7 +10,7 @@ from ..filesystem import REPO_PATH
 
 
 class Git:
-    def __init__(self, path: Path = None, branch: str = 'master'):
+    def __init__(self, path: Path = None, branch: str = "master"):
         if path is None:
             path = REPO_PATH
         self.repo = git.Repo(path)
@@ -19,25 +19,25 @@ class Git:
     @contextmanager
     def stash(self) -> Iterator:
         try:
-            print('>>> git stash')
+            print(">>> git stash")
             stash = self.repo.git.stash()
             print(stash)
             yield
         finally:
-            if stash != 'No local changes to save':
-                print('>>> git stash pop')
-                print(self.repo.git.stash('pop'))
+            if stash != "No local changes to save":
+                print(">>> git stash pop")
+                print(self.repo.git.stash("pop"))
 
     @contextmanager
     def other_branch(self, name: str) -> Iterator:
         try:
-            print(f'>>> git branch {name}')
+            print(f">>> git branch {name}")
             print(self.repo.git.branch(name))
             self.checkout(name)
             yield
         finally:
             self.checkout()
-            print(f'>>> git branch -D {name}')
+            print(f">>> git branch -D {name}")
             print(self.repo.git.branch(name, D=True))
 
     def is_on_branch(self) -> bool:
@@ -46,32 +46,32 @@ class Git:
     def checkout(self, branch: Optional[str] = None) -> None:
         if branch is None:
             branch = self.branch
-        print(f'>>> git checkout {branch}')
+        print(f">>> git checkout {branch}")
         with self.stash():
             print(self.repo.git.checkout(branch))
 
     def status(self) -> None:
         assert self.is_on_branch()
-        print('>>> git status')
+        print(">>> git status")
         print(self.repo.git.status())
 
     def log(self) -> None:
         assert self.is_on_branch()
-        print('>>> git log')
+        print(">>> git log")
         print(self.repo.git.log()[:10000])
 
     def diff(self) -> None:
         assert self.is_on_branch()
-        print('>>> git diff')
+        print(">>> git diff")
         print(self.repo.git.diff())
 
     def pull(self) -> None:
         assert self.is_on_branch()
         with self.stash():
-            print('>>> git fetch')
+            print(">>> git fetch")
             print(self.repo.git.fetch())
-            print(f'>>> git rebase origin/{self.branch}')
-            print(self.repo.git.rebase(f'origin/{self.branch}'))
+            print(f">>> git rebase origin/{self.branch}")
+            print(self.repo.git.rebase(f"origin/{self.branch}"))
 
     def push(self, branch: Optional[str] = None) -> None:
         assert self.is_on_branch()
@@ -79,12 +79,12 @@ class Git:
 
         if branch is None:
             print(f">>> git push origin {self.branch}")
-            print(self.repo.git.push('origin', branch))
+            print(self.repo.git.push("origin", branch))
         else:
-            assert ' ' not in branch
+            assert " " not in branch
             with self.other_branch(branch):
                 print(f">>> git push origin {branch}")
-                print(self.repo.git.push('origin', branch))
+                print(self.repo.git.push("origin", branch))
 
     def commit(
         self,
@@ -111,7 +111,7 @@ class Git:
     def add(self, file: Optional[str] = None) -> None:
         assert self.is_on_branch()
         if file is not None:
-            print(f'>>> git add {file}')
+            print(f">>> git add {file}")
             print(self.repo.git.add(file))
 
         else:
@@ -127,14 +127,14 @@ class Git:
 
     def rm(self, file: str) -> None:
         assert self.is_on_branch()
-        print(f'>>> git rm {file} -r')
+        print(f">>> git rm {file} -r")
         print(self.repo.git.rm(file, r=True))
 
     def reset(self, file: Optional[str] = None, hard: bool = False) -> None:
         if hard:
-            print(f'>>> git reset {file} --hard')
+            print(f">>> git reset {file} --hard")
         else:
-            print(f'>>> git reset {file}')
+            print(f">>> git reset {file}")
         if file is None:
             print(self.repo.git.reset(hard=hard))
         else:

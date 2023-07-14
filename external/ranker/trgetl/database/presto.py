@@ -11,32 +11,32 @@ from .base_database import BaseDatabase
 
 class Presto(BaseDatabase):
     CONN_PARAMETERS = {
-        'trg': dict(
-            http_scheme='https',
-            host='rbhp-control5.rbdev.mail.ru',
+        "trg": dict(
+            http_scheme="https",
+            host="rbhp-control5.rbdev.mail.ru",
             port=8093,
-            user='{user}',
-            catalog='hive',
+            user="{user}",
+            catalog="hive",
         )
     }
     AUTH_PARAMETERS = {
-        'trg': dict(
-            config='/etc/krb5.conf',
-            service_name='presto',
-            principal='{principal}',
-            ca_bundle='/etc/prestosql/prestosql_cacerts.pem',
+        "trg": dict(
+            config="/etc/krb5.conf",
+            service_name="presto",
+            principal="{principal}",
+            ca_bundle="/etc/prestosql/prestosql_cacerts.pem",
         )
     }
 
     RETRY_ERRORS = {
-        'Encountered too many errors talking to a worker node': 'Worker node crashed',
+        "Encountered too many errors talking to a worker node": "Worker node crashed",
     }
 
     def __init__(self, db=None, retries: int = 10, retry_sleep: int = 10):
         if db is None:
-            db = 'trg'
+            db = "trg"
 
-        assert db in self.CONN_PARAMETERS, f'Unknown db: {db}'
+        assert db in self.CONN_PARAMETERS, f"Unknown db: {db}"
         self.db = db
         self.auth_parameters, self.conn_parameters = self._get_connection_parameters(db)
         self.retries = retries
@@ -56,13 +56,13 @@ class Presto(BaseDatabase):
         user = getpass.getuser()
 
         klist = subprocess.run(["klist"], stdout=subprocess.PIPE).stdout.decode()
-        principal = re.findall(r'Default principal: (\S*)\n', klist)
+        principal = re.findall(r"Default principal: (\S*)\n", klist)
         assert len(principal) == 1
         principal = principal[0]
 
         for parameters in (auth_parameters, conn_parameters):
             for key, value in parameters.items():
-                if isinstance(value, str) and '{' in value:
+                if isinstance(value, str) and "{" in value:
                     parameters[key] = value.format(user=user, principal=principal)
         return auth_parameters, conn_parameters
 

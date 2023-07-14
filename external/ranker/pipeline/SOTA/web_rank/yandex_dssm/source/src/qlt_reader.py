@@ -8,7 +8,7 @@ import numpy as np
 import torch
 from torch.utils.data import IterableDataset
 
-so_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../bin/libqltreader.so'))
+so_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../bin/libqltreader.so"))
 # print(so_path)
 libqltreader = cdll.LoadLibrary(so_path)
 libqltreader.QLTReader_new.restype = ctypes.c_void_p
@@ -26,7 +26,7 @@ class Recover:
         self.words = []
         with open(dict_path) as f:
             for word in f:
-                word, cnt = word.strip().split('\t')
+                word, cnt = word.strip().split("\t")
                 word = word.strip().lower()
                 self.words.append(word.strip())
 
@@ -34,7 +34,7 @@ class Recover:
         return self.recover(idxs)
 
     def recover(self, idxs):
-        return ' '.join(self.words[i - 2] if i != 1 else '<UNK>' for i in idxs if i != 0)
+        return " ".join(self.words[i - 2] if i != 1 else "<UNK>" for i in idxs if i != 0)
 
 
 class Indexer:
@@ -43,7 +43,7 @@ class Indexer:
         idx = 1
         with open(dict_path) as f:
             for word in f:
-                word, cnt = word.strip().split('\t')
+                word, cnt = word.strip().split("\t")
                 word = word.strip().lower()
                 self.word2idx[word] = idx
                 idx += 1
@@ -61,7 +61,7 @@ class QLTReader(object):
         self.group_sizes = np.zeros([num_queries], dtype=np.int32)
         self.titles = np.zeros([batch_size, 20], dtype=np.int32)
         self.labels = np.zeros([batch_size], dtype=np.int32)
-        self.obj = libqltreader.QLTReader_new(qlt_path.encode('UTF-8'), batch_size, num_queries)
+        self.obj = libqltreader.QLTReader_new(qlt_path.encode("UTF-8"), batch_size, num_queries)
 
     def __enter__(self):
         return self
@@ -94,10 +94,10 @@ class QLTReader(object):
 class MultifileQLT(IterableDataset):
     def __init__(self, path, num_pairs=3072, num_queries=384):
         super(MultifileQLT).__init__()
-        self.files = [os.path.join(path, f) for f in os.listdir(path) if f.endswith('.bin')]
+        self.files = [os.path.join(path, f) for f in os.listdir(path) if f.endswith(".bin")]
         self.num_pairs = num_pairs
         self.num_queries = num_queries
-        logging.warning('Found %d binary objects' % len(self.files))
+        logging.warning("Found %d binary objects" % len(self.files))
 
     def __iter__(self):
         worker_info = torch.utils.data.get_worker_info()

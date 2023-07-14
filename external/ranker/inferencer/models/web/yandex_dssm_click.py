@@ -7,4 +7,4 @@ class Container(YandexDSSM):
         super().__init__(hparams)
 
         self.checkpoint_path = match_arcifact_path(hparams, "checkpoint_path", "state_dict.pck")
-        self.known_words_path = match_arcifact_path(hparams, "checkpoint_path", 'unigram.1mil_my.txt')
+        self.known_words_path = match_arcifact_path(hparams, "checkpoint_path", "unigram.1mil_my.txt")

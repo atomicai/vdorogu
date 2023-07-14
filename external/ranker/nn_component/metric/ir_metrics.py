@@ -34,8 +34,8 @@ def calc_average_metric(queries_data, calc_metric, param):
 
 
 def calc_ndcg_by_query(queries_data, new_query, k):
-    query_predicts = queries_data[new_query]['predictions']
-    query_relevance = queries_data[new_query]['relevance']
+    query_predicts = queries_data[new_query]["predictions"]
+    query_relevance = queries_data[new_query]["relevance"]
     if all(query_relevance[0] == i for i in query_relevance):
         return None
     sort_query_relevance = [
@@ -45,8 +45,8 @@ def calc_ndcg_by_query(queries_data, new_query, k):
 
 
 def calc_dcg_by_query(queries_data, new_query, k):
-    query_predicts = queries_data[new_query]['predictions']
-    query_relevance = queries_data[new_query]['relevance']
+    query_predicts = queries_data[new_query]["predictions"]
+    query_relevance = queries_data[new_query]["relevance"]
     if all(query_relevance[0] == i for i in query_relevance):
         return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
@@ -54,7 +54,7 @@ def calc_dcg_by_query(queries_data, new_query, k):
 
 
 def calc_max_dcg_by_query(queries_data, new_query, k):
-    r = queries_data[new_query]['relevance']
+    r = queries_data[new_query]["relevance"]
     return calc_dcg(sorted(r, reverse=True), k, verbose=False)
 
 
@@ -80,8 +80,8 @@ def calc_dcg(r, k, verbose=False):
 
 
 def calc_precision_by_query(queries_data, new_query, p, threshold=3):
-    query_predicts = queries_data[new_query]['predictions']
-    query_relevance = queries_data[new_query]['relevance']
+    query_predicts = queries_data[new_query]["predictions"]
+    query_relevance = queries_data[new_query]["relevance"]
     if p is None:
         new_p = 10
     else:
@@ -98,8 +98,8 @@ def calc_precision_by_query(queries_data, new_query, p, threshold=3):
 
 
 def calc_recall_by_query(queries_data, new_query, r, threshold=3):
-    query_predicts = queries_data[new_query]['predictions']
-    query_relevance = queries_data[new_query]['relevance']
+    query_predicts = queries_data[new_query]["predictions"]
+    query_relevance = queries_data[new_query]["relevance"]
     if all(query_relevance[0] == i for i in query_relevance):
         return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
@@ -125,8 +125,8 @@ def calc_f1_by_query(queries_data, new_query, p, threshold=3):
 
 
 def calc_defective_pairs_by_query(queries_data, new_query, d):
-    query_predicts = queries_data[new_query]['predictions']
-    query_relevance = queries_data[new_query]['relevance']
+    query_predicts = queries_data[new_query]["predictions"]
+    query_relevance = queries_data[new_query]["relevance"]
     if all(query_relevance[0] == i for i in query_relevance):
         return None
     if d is None:
@@ -157,8 +157,8 @@ def map_mark_to_prob(mark):
 
 def calc_pfound_by_query(queries_data, new_query, f):
     p_out = 0.15
-    query_predicts = queries_data[new_query]['predictions']
-    query_relevance = queries_data[new_query]['relevance']
+    query_predicts = queries_data[new_query]["predictions"]
+    query_relevance = queries_data[new_query]["relevance"]
     if all(query_relevance[0] == i for i in query_relevance):
         return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
@@ -176,8 +176,8 @@ def calc_pfound_by_query(queries_data, new_query, f):
 
 
 def calc_err_by_query(queries_data, new_query, e):
-    query_predicts = queries_data[new_query]['predictions']
-    query_relevance = queries_data[new_query]['relevance']
+    query_predicts = queries_data[new_query]["predictions"]
+    query_relevance = queries_data[new_query]["relevance"]
     if all(query_relevance[0] == i for i in query_relevance):
         return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
@@ -195,8 +195,8 @@ def calc_err_by_query(queries_data, new_query, e):
 
 
 def calc_best_by_query(queries_data, new_query, args):
-    query_predicts = queries_data[new_query]['predictions']
-    query_relevance = queries_data[new_query]['relevance']
+    query_predicts = queries_data[new_query]["predictions"]
+    query_relevance = queries_data[new_query]["relevance"]
     if all(query_relevance[0] == i for i in query_relevance):
         return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
@@ -206,8 +206,8 @@ def calc_best_by_query(queries_data, new_query, args):
 
 
 def calc_good_by_query(queries_data, new_query, threshold):
-    query_predicts = queries_data[new_query]['predictions']
-    query_relevance = queries_data[new_query]['relevance']
+    query_predicts = queries_data[new_query]["predictions"]
+    query_relevance = queries_data[new_query]["relevance"]
     if all(query_relevance[0] == i or i < threshold for i in query_relevance):
         return None
     sort_query_relevance = [x for (y, x) in sorted(zip(query_predicts, query_relevance), reverse=True)]
@@ -220,7 +220,7 @@ def test_model(y_pred, y_true, groups, k=5):
     res = {}
     for key, group in groupby(zip(y_pred, y_true, groups), key=lambda x: x[2]):
         group = list(zip(*group))
-        res[key] = {'relevance': group[1], 'predictions': group[0]}
+        res[key] = {"relevance": group[1], "predictions": group[0]}
     return calc_average_metric(res, calc_ndcg_by_query, k)
 
 

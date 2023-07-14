@@ -22,8 +22,8 @@ class LaBSEContainer(Container):
         self.config_path = match_arcifact_path(hparams, "config_path")
         self.checkpoint_path = match_arcifact_path(hparams, "checkpoint_path", "weights.pck")
 
-        self.query_maxlen = hparams['query_maxlen']
-        self.document_maxlen = hparams['document_maxlen']
+        self.query_maxlen = hparams["query_maxlen"]
+        self.document_maxlen = hparams["document_maxlen"]
 
     def load(self):
         self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_path)
@@ -62,13 +62,13 @@ class LaBSEDSSMContainer(Container):
         self.config_path = match_arcifact_path(hparams, "config_path")
         self.checkpoint_path = match_arcifact_path(hparams, "checkpoint_path", "weights.pck")
 
-        self.query_maxlen = hparams['query_maxlen']
-        self.document_maxlen = hparams['document_maxlen']
+        self.query_maxlen = hparams["query_maxlen"]
+        self.document_maxlen = hparams["document_maxlen"]
 
     def load(self):
         self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_path)
         self.model = BertSentenceEmb("bert", self.config_path, pretrained=False, output_size=512)
-        special_tokens_dict = {'eos_token': '[EOS]'}
+        special_tokens_dict = {"eos_token": "[EOS]"}
         self.tokenizer.add_special_tokens(special_tokens_dict)
         self.tokenizer.bos_token = self.tokenizer.cls_token
         self.model.model.resize_token_embeddings(len(self.tokenizer))
@@ -115,7 +115,7 @@ class LaBSEDSSMContainer(Container):
         return query, document, 0.0, 1  # fake fields for collate
 
     def collate(self, batch):
-        if self.optimized_for == 'onnx':  # (cpu, gpu, onnx)
+        if self.optimized_for == "onnx":  # (cpu, gpu, onnx)
             return valid_collate_dssm(batch, pad_token_id=self.pad_id, pad8=False)
         else:
             return valid_collate_dssm(batch, pad_token_id=self.pad_id)
@@ -153,8 +153,8 @@ class LaBSEDSSMContainer(Container):
 
         res = (query_emb * document_emb).sum(-1) * 10
 
-        log.append(('q_emb', query_emb[:, :10]))
-        log.append(('d_emb', document_emb[:, :10]))
-        log.append(('res', res))
+        log.append(("q_emb", query_emb[:, :10]))
+        log.append(("d_emb", document_emb[:, :10]))
+        log.append(("res", res))
 
         return OrderedDict(log)

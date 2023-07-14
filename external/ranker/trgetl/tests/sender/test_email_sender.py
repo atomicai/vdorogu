@@ -13,11 +13,11 @@ from mock import patch  # type: ignore
 from ...sender import Email, EmailError
 
 ENABLE_MOCKING = True
-DEFAULT_KEYS_PATH = Path(__file__).parent.parent.parent / '__tokens__'
-LOCALHOST = 'localhost'
-SEND_FROM = 'rbhp-robots@we.mail.ru'
-TEST_AUTHOR = 'd.kulemin'
-TEST_RECEIVER = getpass.getuser() + '@corp.mail.ru'
+DEFAULT_KEYS_PATH = Path(__file__).parent.parent.parent / "__tokens__"
+LOCALHOST = "localhost"
+SEND_FROM = "rbhp-robots@we.mail.ru"
+TEST_AUTHOR = "d.kulemin"
+TEST_RECEIVER = getpass.getuser() + "@corp.mail.ru"
 
 
 class MailObject:
@@ -29,8 +29,8 @@ class MailObject:
 
 
 MAILS = [
-    MailObject('simple_mailer', SEND_FROM, LOCALHOST, True),
-    MailObject('mailer_with_wrong_address', 'wrong@address', LOCALHOST, False),
+    MailObject("simple_mailer", SEND_FROM, LOCALHOST, True),
+    MailObject("mailer_with_wrong_address", "wrong@address", LOCALHOST, False),
 ]
 
 
@@ -43,9 +43,9 @@ def etalon_mail(request: SubRequest) -> MailObject:
     return request.param
 
 
-@pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason='can not guarantee that token path exists')
+@pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason="can not guarantee that token path exists")
 def test_token_path_exists() -> None:
-    assert DEFAULT_KEYS_PATH.exists(), 'there are should be a path to token files'
+    assert DEFAULT_KEYS_PATH.exists(), "there are should be a path to token files"
 
 
 def test_import() -> None:
@@ -60,23 +60,23 @@ def test_email_initialization_v1(etalon_mail: MailObject) -> None:
             Email(send_from=etalon_mail.send_from, server=etalon_mail.server)
     else:
         mailer = Email(send_from=etalon_mail.send_from, server=etalon_mail.server)
-        assert mailer.send_from == etalon_mail.send_from, f'should be {etalon_mail.send_from}, but got {mailer.send_from}'
-        assert mailer.server == etalon_mail.server, f'should be {etalon_mail.server}, but got {mailer.server}'
+        assert mailer.send_from == etalon_mail.send_from, f"should be {etalon_mail.send_from}, but got {mailer.send_from}"
+        assert mailer.server == etalon_mail.server, f"should be {etalon_mail.server}, but got {mailer.server}"
 
 
 @pytest.mark.parametrize(
-    'send_from, server, valid',
+    "send_from, server, valid",
     [
         pytest.param(SEND_FROM, LOCALHOST, True, id=SEND_FROM),
-        pytest.param('wrong@address', LOCALHOST, False, id='wrong@address'),
+        pytest.param("wrong@address", LOCALHOST, False, id="wrong@address"),
         pytest.param(
             None,
             LOCALHOST,
             True,
             marks=[
-                pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason='can not guarantee that token path exists')
+                pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason="can not guarantee that token path exists")
             ],
-            id='NoneAddress',
+            id="NoneAddress",
         ),
     ],
 )
@@ -86,20 +86,20 @@ def test_email_initialization_v2(send_from: str, server: str, valid: bool) -> No
             Email(send_from=send_from, server=server)
     else:
         mailer = Email(send_from=send_from, server=server)
-        assert mailer.send_from == send_from or SEND_FROM, f'should be {send_from}, but got {mailer.send_from}'
-        assert mailer.server == server, f'should be {server}, but got {mailer.server}'
+        assert mailer.send_from == send_from or SEND_FROM, f"should be {send_from}, but got {mailer.send_from}"
+        assert mailer.server == server, f"should be {server}, but got {mailer.server}"
 
 
 @pytest.mark.parametrize(
-    'email, etalon_response',
+    "email, etalon_response",
     [
         pytest.param(SEND_FROM, True, id=SEND_FROM),
-        pytest.param('abc@mail.com', True, id='abc@mail.com'),
-        pytest.param('abc_def@mail.com', True, id='abc_def@mail.com'),
-        pytest.param('abc-d@mail.com', True, id='abc-d@mail.com'),
-        pytest.param('abc.def@mail.com', True, id='abc.def@mail.com'),
-        pytest.param('abc.def@mail', False, id='abc.def@mail'),
-        pytest.param('abc.def@', False, id='abc.def@'),
+        pytest.param("abc@mail.com", True, id="abc@mail.com"),
+        pytest.param("abc_def@mail.com", True, id="abc_def@mail.com"),
+        pytest.param("abc-d@mail.com", True, id="abc-d@mail.com"),
+        pytest.param("abc.def@mail.com", True, id="abc.def@mail.com"),
+        pytest.param("abc.def@mail", False, id="abc.def@mail"),
+        pytest.param("abc.def@", False, id="abc.def@"),
     ],
 )
 def test_check_if_email_address_is_valid(etalon_mail: MailObject, email: str, etalon_response: bool) -> None:
@@ -109,16 +109,16 @@ def test_check_if_email_address_is_valid(etalon_mail: MailObject, email: str, et
     else:
         mailer = Email(send_from=etalon_mail.send_from)
         result = mailer._is_valid_email(email)
-        assert result == etalon_response, f'should be {etalon_response}, but got {result}'
+        assert result == etalon_response, f"should be {etalon_response}, but got {result}"
 
 
 @pytest.mark.parametrize(
-    'receivers, etalon_response',
+    "receivers, etalon_response",
     [
-        pytest.param(SEND_FROM, [SEND_FROM], id='single_receiver'),
-        pytest.param([SEND_FROM, TEST_RECEIVER], [SEND_FROM, TEST_RECEIVER], id='list_receivers'),
-        pytest.param({SEND_FROM, TEST_RECEIVER}, {SEND_FROM, TEST_RECEIVER}, id='set_receivers'),
-        pytest.param((SEND_FROM, TEST_RECEIVER), (SEND_FROM, TEST_RECEIVER), id='tuple_receivers'),
+        pytest.param(SEND_FROM, [SEND_FROM], id="single_receiver"),
+        pytest.param([SEND_FROM, TEST_RECEIVER], [SEND_FROM, TEST_RECEIVER], id="list_receivers"),
+        pytest.param({SEND_FROM, TEST_RECEIVER}, {SEND_FROM, TEST_RECEIVER}, id="set_receivers"),
+        pytest.param((SEND_FROM, TEST_RECEIVER), (SEND_FROM, TEST_RECEIVER), id="tuple_receivers"),
     ],
 )
 def test_to_collection(
@@ -130,20 +130,20 @@ def test_to_collection(
     else:
         mailer = Email(send_from=etalon_mail.send_from)
         result = mailer._to_collection(receivers)
-        assert result == etalon_response, f'should be {etalon_response}, but got {result}'
+        assert result == etalon_response, f"should be {etalon_response}, but got {result}"
 
 
 @pytest.mark.parametrize(
-    'content, receivers, subject, attach_name, markup, etalon_response',
+    "content, receivers, subject, attach_name, markup, etalon_response",
     [
         pytest.param(
-            'TEST text',
+            "TEST text",
             TEST_RECEIVER,
-            'simple',
+            "simple",
             None,
             None,
             dedent(
-                f'''\
+                f"""\
                 Content-Type: multipart/mixed
                 MIME-Version: 1.0
                 To: {TEST_RECEIVER}
@@ -153,18 +153,18 @@ def test_to_collection(
                 Content-Type: text/plain; charset="utf-8"
                 MIME-Version: 1.0
                 Content-Transfer-Encoding: base64
-                VEVTVCB0ZXh0'''
+                VEVTVCB0ZXh0"""
             ),
-            id='simple',
+            id="simple",
         ),
         pytest.param(
-            'TEST text',
+            "TEST text",
             TEST_RECEIVER,
-            'simple plain text',
+            "simple plain text",
             None,
-            'plain',
+            "plain",
             dedent(
-                f'''\
+                f"""\
                 Content-Type: multipart/mixed
                 MIME-Version: 1.0
                 To: {TEST_RECEIVER}
@@ -174,9 +174,9 @@ def test_to_collection(
                 Content-Type: text/plain; charset="utf-8"
                 MIME-Version: 1.0
                 Content-Transfer-Encoding: base64
-                VEVTVCB0ZXh0'''
+                VEVTVCB0ZXh0"""
             ),
-            id='simple_plain_text',
+            id="simple_plain_text",
         ),
         pytest.param(
             dedent(
@@ -190,11 +190,11 @@ def test_to_collection(
             """
             ),
             TEST_RECEIVER,
-            'simple html text',
+            "simple html text",
             None,
-            'html',
+            "html",
             dedent(
-                f'''\
+                f"""\
                 Content-Type: multipart/mixed
                 MIME-Version: 1.0
                 To: {TEST_RECEIVER}
@@ -205,18 +205,18 @@ def test_to_collection(
                 MIME-Version: 1.0
                 Content-Transfer-Encoding: base64
                 PGh0bWw+CiAgICA8aGVhZD48L2hlYWQ+CiAgICA8Ym9keT4KICAgICAgICA8cD5URVNUIHRleHQ8
-                L3A+CiAgICA8L2JvZHk+CjwvaHRtbD4K'''
+                L3A+CiAgICA8L2JvZHk+CjwvaHRtbD4K"""
             ),
-            id='simple_html_text',
+            id="simple_html_text",
         ),
         pytest.param(
-            'TEST text',
-            ['a@mail.com', 'b@mail.com', 'c@mail.com'],
-            'multiple receivers',
+            "TEST text",
+            ["a@mail.com", "b@mail.com", "c@mail.com"],
+            "multiple receivers",
             None,
             None,
             dedent(
-                '''\
+                """\
                 Content-Type: multipart/mixed
                 MIME-Version: 1.0
                 To: a@mail.com, b@mail.com, c@mail.com
@@ -226,15 +226,15 @@ def test_to_collection(
                 Content-Type: text/plain; charset="utf-8"
                 MIME-Version: 1.0
                 Content-Transfer-Encoding: base64
-                VEVTVCB0ZXh0'''
+                VEVTVCB0ZXh0"""
             ),
-            id='multiple_receivers',
+            id="multiple_receivers",
         ),
         pytest.param(
-            'TEST text',
+            "TEST text",
             TEST_RECEIVER,
-            'simple with attach',
-            'attachment.png',
+            "simple with attach",
+            "attachment.png",
             None,
             dedent(
                 f'''\
@@ -253,13 +253,13 @@ def test_to_collection(
                 Content-Transfer-Encoding: base64
                 Content-Disposition: attachment; filename="attachment.png"'''
             ),
-            id='simple_with_attachment',
+            id="simple_with_attachment",
         ),
         pytest.param(
-            'TEST text',
+            "TEST text",
             TEST_RECEIVER,
-            'simple with multiple attach',
-            ['att1.png', 'att2.png'],
+            "simple with multiple attach",
+            ["att1.png", "att2.png"],
             None,
             dedent(
                 f'''\
@@ -282,7 +282,7 @@ def test_to_collection(
                 Content-Transfer-Encoding: base64
                 Content-Disposition: attachment; filename="att2.png"'''
             ),
-            id='multiple_attachments',
+            id="multiple_attachments",
         ),
     ],
 )
@@ -310,28 +310,28 @@ def test_form_message_v1(
                 attach.append(tmp)
         else:
             attach = None
-        markup = markup or 'plain'
+        markup = markup or "plain"
         message = mailer._form_message(content, receivers, subject, attach, markup).as_string()
         result_list = []
-        for line in message.split('\n'):
-            line = line.split('; boundary')[0]
-            if line and all(token not in line for token in ['==', 'Date', 'From']):
+        for line in message.split("\n"):
+            line = line.split("; boundary")[0]
+            if line and all(token not in line for token in ["==", "Date", "From"]):
                 result_list.append(line)
-        result = '\n'.join(result_list)
-        assert result == etalon_response, f'should be {etalon_response}, but got {result}'
+        result = "\n".join(result_list)
+        assert result == etalon_response, f"should be {etalon_response}, but got {result}"
 
 
 @pytest.mark.parametrize(
-    'content, receivers, subject, attach_name, markup, etalon_response',
+    "content, receivers, subject, attach_name, markup, etalon_response",
     [
         pytest.param(
-            'TEST text',
+            "TEST text",
             TEST_RECEIVER,
-            'simple',
+            "simple",
             None,
             None,
             dedent(
-                f'''\
+                f"""\
                 Content-Type: multipart/mixed
                 MIME-Version: 1.0
                 To: {TEST_RECEIVER}
@@ -341,18 +341,18 @@ def test_form_message_v1(
                 Content-Type: text/plain; charset="utf-8"
                 MIME-Version: 1.0
                 Content-Transfer-Encoding: base64
-                VEVTVCB0ZXh0'''
+                VEVTVCB0ZXh0"""
             ),
-            id='simple',
+            id="simple",
         ),
         pytest.param(
-            'TEST text',
+            "TEST text",
             TEST_RECEIVER,
-            'simple plain text',
+            "simple plain text",
             None,
-            'plain',
+            "plain",
             dedent(
-                f'''\
+                f"""\
                 Content-Type: multipart/mixed
                 MIME-Version: 1.0
                 To: {TEST_RECEIVER}
@@ -362,9 +362,9 @@ def test_form_message_v1(
                 Content-Type: text/plain; charset="utf-8"
                 MIME-Version: 1.0
                 Content-Transfer-Encoding: base64
-                VEVTVCB0ZXh0'''
+                VEVTVCB0ZXh0"""
             ),
-            id='simple_plain_text',
+            id="simple_plain_text",
         ),
         pytest.param(
             dedent(
@@ -378,11 +378,11 @@ def test_form_message_v1(
             """
             ),
             TEST_RECEIVER,
-            'simple html text',
+            "simple html text",
             None,
-            'html',
+            "html",
             dedent(
-                f'''\
+                f"""\
                 Content-Type: multipart/mixed
                 MIME-Version: 1.0
                 To: {TEST_RECEIVER}
@@ -393,18 +393,18 @@ def test_form_message_v1(
                 MIME-Version: 1.0
                 Content-Transfer-Encoding: base64
                 PGh0bWw+CiAgICA8aGVhZD48L2hlYWQ+CiAgICA8Ym9keT4KICAgICAgICA8cD5URVNUIHRleHQ8
-                L3A+CiAgICA8L2JvZHk+CjwvaHRtbD4K'''
+                L3A+CiAgICA8L2JvZHk+CjwvaHRtbD4K"""
             ),
-            id='simple_html_text',
+            id="simple_html_text",
         ),
         pytest.param(
-            'TEST text',
-            ['a@mail.com', 'b@mail.com', 'c@mail.com'],
-            'multiple receivers',
+            "TEST text",
+            ["a@mail.com", "b@mail.com", "c@mail.com"],
+            "multiple receivers",
             None,
             None,
             dedent(
-                '''\
+                """\
                 Content-Type: multipart/mixed
                 MIME-Version: 1.0
                 To: a@mail.com, b@mail.com, c@mail.com
@@ -414,15 +414,15 @@ def test_form_message_v1(
                 Content-Type: text/plain; charset="utf-8"
                 MIME-Version: 1.0
                 Content-Transfer-Encoding: base64
-                VEVTVCB0ZXh0'''
+                VEVTVCB0ZXh0"""
             ),
-            id='multiple_receivers',
+            id="multiple_receivers",
         ),
         pytest.param(
-            'TEST text',
+            "TEST text",
             TEST_RECEIVER,
-            'simple with attach',
-            'attachment.png',
+            "simple with attach",
+            "attachment.png",
             None,
             dedent(
                 f'''\
@@ -441,13 +441,13 @@ def test_form_message_v1(
                 Content-Transfer-Encoding: base64
                 Content-Disposition: attachment; filename="attachment.png"'''
             ),
-            id='simple_with_attachment',
+            id="simple_with_attachment",
         ),
         pytest.param(
-            'TEST text',
+            "TEST text",
             TEST_RECEIVER,
-            'simple with multiple attach',
-            ['att1.png', 'att2.png'],
+            "simple with multiple attach",
+            ["att1.png", "att2.png"],
             None,
             dedent(
                 f'''\
@@ -470,7 +470,7 @@ def test_form_message_v1(
                 Content-Transfer-Encoding: base64
                 Content-Disposition: attachment; filename="att2.png"'''
             ),
-            id='multiple_attachments',
+            id="multiple_attachments",
         ),
     ],
 )
@@ -499,43 +499,43 @@ def test_form_message_v2(
                 attach.append(tmp)
         else:
             attach = None
-        markup = markup or 'plain'
+        markup = markup or "plain"
         message = mailer._form_message(content, receivers, subject, attach, markup).as_string()
         result_list = []
-        for line in message.split('\n'):
-            line = line.split('; boundary')[0]
-            if line and all(token not in line for token in ['==', 'Date', 'From']):
+        for line in message.split("\n"):
+            line = line.split("; boundary")[0]
+            if line and all(token not in line for token in ["==", "Date", "From"]):
                 result_list.append(line)
-        result = '\n'.join(result_list)
-        assert result == etalon_response, f'should be {etalon_response}, but got {result}'
+        result = "\n".join(result_list)
+        assert result == etalon_response, f"should be {etalon_response}, but got {result}"
 
 
 @pytest.mark.parametrize(
-    'content, encoded_text, receivers, subject, attach_name, markup, should_raise',
+    "content, encoded_text, receivers, subject, attach_name, markup, should_raise",
     [
-        pytest.param('TEST text', 'VEVTVCB0ZXh0', TEST_RECEIVER, 'simple', None, None, False, id='simple'),
+        pytest.param("TEST text", "VEVTVCB0ZXh0", TEST_RECEIVER, "simple", None, None, False, id="simple"),
         pytest.param(
-            'TEST text', 'VEVTVCB0ZXh0', 'wrong@address', 'wrong_receiver', None, None, True, id='wrong_receiver'
+            "TEST text", "VEVTVCB0ZXh0", "wrong@address", "wrong_receiver", None, None, True, id="wrong_receiver"
         ),
         pytest.param(
-            'TEST text',
-            'VEVTVCB0ZXh0',
+            "TEST text",
+            "VEVTVCB0ZXh0",
             TEST_RECEIVER,
-            'simple with attach',
-            'attachment.png',
+            "simple with attach",
+            "attachment.png",
             None,
             False,
-            id='simple_with_attachment',
+            id="simple_with_attachment",
         ),
         pytest.param(
-            'TEST text',
-            'VEVTVCB0ZXh0',
+            "TEST text",
+            "VEVTVCB0ZXh0",
             TEST_RECEIVER,
-            'simple with multiple attach',
-            ['att1.png', 'att2.png'],
+            "simple with multiple attach",
+            ["att1.png", "att2.png"],
             None,
             False,
-            id='multiple_attachments',
+            id="multiple_attachments",
         ),
     ],
 )
@@ -557,7 +557,7 @@ def test_send(
         with pytest.raises(EmailError):
             mailer = Email(send_from=etalon_mail.send_from, server=etalon_mail.server)
             if ENABLE_MOCKING:
-                with patch('smtplib.SMTP', autospec=True) as mock_smtp:
+                with patch("smtplib.SMTP", autospec=True) as mock_smtp:
                     mailer.send(content, receivers, subject=subject, markup=markup)
             else:
                 mailer.send(content, receivers, subject=subject, markup=markup)
@@ -579,14 +579,14 @@ def test_send(
         else:
             attach = None
         if ENABLE_MOCKING:
-            with patch('smtplib.SMTP', autospec=True) as mock_smtp:
+            with patch("smtplib.SMTP", autospec=True) as mock_smtp:
                 mailer.send(content, receivers, subject=subject, attachments=attach, markup=markup)
                 mock_smtp.assert_called()
                 name, args, kwargs = mock_smtp.method_calls.pop(0)
-                assert name == '().sendmail' and {} == kwargs, 'sendmail() method was not called'
+                assert name == "().sendmail" and {} == kwargs, "sendmail() method was not called"
                 from_, to_, body_ = args
-                assert etalon_mail.send_from == from_, f'should be {etalon_mail.send_from}, but got {from_}'
-                assert receivers == to_, f'should be {receivers}, but got {to_}'
-                assert encoded_text in body_, f'{encoded_text} should be in {body_}'
+                assert etalon_mail.send_from == from_, f"should be {etalon_mail.send_from}, but got {from_}"
+                assert receivers == to_, f"should be {receivers}, but got {to_}"
+                assert encoded_text in body_, f"{encoded_text} should be in {body_}"
         else:
             mailer.send(content, receivers, subject=subject, attachments=attach, markup=markup)

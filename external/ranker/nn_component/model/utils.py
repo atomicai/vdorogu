@@ -56,7 +56,7 @@ def load_by_all_means(path, warn=True):
     # Loading state_dicts and lightning modules
 
     try:
-        data = torch.load(path, map_location='cpu')
+        data = torch.load(path, map_location="cpu")
     except ModuleNotFoundError:
         # maybe it is apex issue?
 
@@ -73,17 +73,17 @@ def load_by_all_means(path, warn=True):
         class PicklePatch:
             Unpickler = UpicklePatch
 
-        data = torch.load(path, pickle_module=PicklePatch, map_location='cpu')
+        data = torch.load(path, pickle_module=PicklePatch, map_location="cpu")
         if warn:
             print("Warning: Supressing apex import error", file=sys.stderr)
 
-    if 'state_dict' in data and 'epoch' in data:
+    if "state_dict" in data and "epoch" in data:
         # Yep, we get lit_checkpoint and not state_dict
 
         # just in case we need them
         data.get("hparams", data.get("hyper_parameters"))
 
-        data = data['state_dict']
+        data = data["state_dict"]
 
         if warn:
             print("Warning: Loading lit_checkpoint, not state_dict", file=sys.stderr)

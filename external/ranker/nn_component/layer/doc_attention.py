@@ -3,7 +3,14 @@ import sys
 import torch
 import transformers
 from transformers import XLMRobertaConfig, XLMRobertaForMaskedLM, XLMRobertaModel
-from transformers.models.bert.modeling_bert import *
+from transformers.models.bert.modeling_bert import (
+    BaseModelOutputWithPoolingAndCrossAttentions,
+    BertEncoder,
+    BertPooler,
+    BertPreTrainedModel,
+    nn,
+    version,
+)
 
 from external.ranker.nn_component.layer.pooling import MaxPool2D as MaxPool
 from external.ranker.nn_component.model.utils import load_by_all_means, load_state_dict_by_all_means

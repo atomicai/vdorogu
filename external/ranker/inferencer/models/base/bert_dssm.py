@@ -23,8 +23,8 @@ class BertDSSMContainer(Container):
         self.config_path = match_arcifact_path(hparams, "config_path")
         self.checkpoint_path = match_arcifact_path(hparams, "checkpoint_path", "weights.pck")
 
-        self.query_maxlen = hparams['query_maxlen']
-        self.document_maxlen = hparams['document_maxlen']
+        self.query_maxlen = hparams["query_maxlen"]
+        self.document_maxlen = hparams["document_maxlen"]
 
     def sample_input(self):
         if self.mode == "scores":
@@ -67,7 +67,7 @@ class BertDSSMContainer(Container):
         return query, document, 0.0, 1  # fake fields for collate
 
     def collate(self, batch):
-        if self.optimized_for == 'onnx':  # (cpu, gpu, onnx)
+        if self.optimized_for == "onnx":  # (cpu, gpu, onnx)
             return valid_collate_dssm(batch, pad8=False)
         else:
             return valid_collate_dssm(batch)
@@ -93,9 +93,9 @@ class BertDSSMContainer(Container):
 
         res = (q_emb * d_emb).sum(-1) * 10
 
-        log.append(('q_emb', q_emb))
-        log.append(('d_emb', d_emb))
-        log.append(('res', res))
+        log.append(("q_emb", q_emb))
+        log.append(("d_emb", d_emb))
+        log.append(("res", res))
 
         return OrderedDict(log)
 
@@ -113,8 +113,8 @@ class BertDSSMwithNormsContainer(Container):
         self.config_path = match_arcifact_path(hparams, "config_path")
         self.checkpoint_path = match_arcifact_path(hparams, "checkpoint_path", "weights.pck")
 
-        self.query_maxlen = hparams['query_maxlen']
-        self.document_maxlen = hparams['document_maxlen']
+        self.query_maxlen = hparams["query_maxlen"]
+        self.document_maxlen = hparams["document_maxlen"]
 
     def sample_input(self):
         if self.mode == "scores":
@@ -179,8 +179,8 @@ class RuBertTiny2DSSMContrainer(BertDSSMContainer):
         self.tokenizer_path = match_arcifact_path(hparams, "tokenizer_path", "tokenizer")
         self.config_path = match_arcifact_path(hparams, "config_path", "config.json")
         self.checkpoint_path = match_arcifact_path(hparams, "checkpoint_path", "weights.pth")
-        self.query_maxlen = hparams['query_maxlen']
-        self.document_maxlen = hparams['document_maxlen']
+        self.query_maxlen = hparams["query_maxlen"]
+        self.document_maxlen = hparams["document_maxlen"]
 
     def load(self):
         self.tokenizer = AutoTokenizer.from_pretrained(self.tokenizer_path)
@@ -188,7 +188,7 @@ class RuBertTiny2DSSMContrainer(BertDSSMContainer):
         self.model.pad_token_id = self.tokenizer.pad_token_id
 
     def collate(self, batch):
-        if self.optimized_for == 'onnx':  # (cpu, gpu, onnx)
+        if self.optimized_for == "onnx":  # (cpu, gpu, onnx)
             return valid_collate_dssm(batch, pad_token_id=self.tokenizer.pad_token_id, pad8=False)
         else:
             return valid_collate_dssm(batch, pad_token_id=self.tokenizer.pad_token_id)
@@ -205,14 +205,14 @@ class BertContainer(Container):
 
         hparams.setdefault("tokenizer_path", "xlm-roberta-base")
 
-        self.model_class = hparams['model_class']
+        self.model_class = hparams["model_class"]
 
         self.tokenizer_path = match_arcifact_path(hparams, "tokenizer_path")
         self.config_path = match_arcifact_path(hparams, "config_path")
         self.checkpoint_path = match_arcifact_path(hparams, "checkpoint_path", "weights.pck")
 
-        self.query_maxlen = hparams['query_maxlen']
-        self.document_maxlen = hparams['document_maxlen']
+        self.query_maxlen = hparams["query_maxlen"]
+        self.document_maxlen = hparams["document_maxlen"]
 
         self.num_labels = 1
         self.pad_id = 1
@@ -260,8 +260,8 @@ class SberBertContainer(BertContainer):
     def load(self):
         self.tokenizer = BertTokenizer.from_pretrained(self.tokenizer_path)
 
-        self.tokenizer.bos_token = '[CLS]'
-        special_tokens_dict = {'eos_token': '[EOS]'}
+        self.tokenizer.bos_token = "[CLS]"
+        special_tokens_dict = {"eos_token": "[EOS]"}
         self.tokenizer.add_special_tokens(special_tokens_dict)
         self.model = Bert(self.model_class, self.config_path, config_path=self.config_path, pretrained=False)
         self.model.bert.resize_token_embeddings(len(self.tokenizer))

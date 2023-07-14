@@ -17,27 +17,27 @@ class Hdfs(BaseDatabase):
 
     def __init__(self, db=None):
         if db is None:
-            db = 'trg'
-        assert db in ['trg'], f'Unknown db: {db}'
+            db = "trg"
+        assert db in ["trg"], f"Unknown db: {db}"
         self.db = db
 
     def ls(self, path, return_directories=False, recursive=False):
-        command = ['hdfs', 'dfs', '-ls', '-C', str(path)]
+        command = ["hdfs", "dfs", "-ls", "-C", str(path)]
         if return_directories:
-            command.insert(-1, '-d')
+            command.insert(-1, "-d")
         if recursive:
-            command.insert(-1, '-R')
+            command.insert(-1, "-R")
         stdout = subprocess.run(command, stdout=subprocess.PIPE).stdout
         stdout = stdout.decode().strip()
-        if stdout == '':
+        if stdout == "":
             return []
         else:
-            return stdout.split('\n')
+            return stdout.split("\n")
 
-    def delete(self, table_name: str, date: Optional[dt.date], date_column: str = '') -> int:
+    def delete(self, table_name: str, date: Optional[dt.date], date_column: str = "") -> int:
         parameters = self._get_parameters_from_ddl(table_name)
-        path = parameters['source']
-        path = path + '/dt=' + str(date)
+        path = parameters["source"]
+        path = path + "/dt=" + str(date)
         return self.rm(path)
 
     def _get_parameters_from_ddl(self, table_name: str) -> Dict[str, Any]:
@@ -48,31 +48,31 @@ class Hdfs(BaseDatabase):
     def rm(self, path):
         files = self.ls(path, return_directories=True)
         if len(files) == 0:
-            print(f'Nothing to remove: {path}')
+            print(f"Nothing to remove: {path}")
         else:
-            command = ['hdfs', 'dfs', '-rm', '-r', str(path)]
+            command = ["hdfs", "dfs", "-rm", "-r", str(path)]
             subprocess.run(command, stdout=subprocess.PIPE).stdout.decode()
-            print(f'Removed: {path}')
+            print(f"Removed: {path}")
         return len(files)
 
     def read(self, path, parse_dates=None) -> pd.DataFrame:
         if parse_dates is None:
             parse_dates = True
 
-        format = path.split('.')[-1]
-        if format == 'csv':
-            sep = ','
-        elif format == 'tsv':
-            sep = '\t'
+        format = path.split(".")[-1]
+        if format == "csv":
+            sep = ","
+        elif format == "tsv":
+            sep = "\t"
         else:
-            raise AssertionError('Unknown format: {format}')
+            raise AssertionError("Unknown format: {format}")
 
         data = self.read_string(path)
         df = pd.read_csv(io.StringIO(data), sep=sep, parse_dates=parse_dates)
         return df
 
     def read_string(self, path):
-        assert isinstance(path, str), 'path should be string for read_string'
+        assert isinstance(path, str), "path should be string for read_string"
         client = AutoConfigClient()
         files = self._fixed_iterator(
             client.text,
@@ -90,7 +90,7 @@ class Hdfs(BaseDatabase):
             for i in callable(path, **kwargs):
                 result.append(i)
         except RuntimeError as e:
-            if str(e) != 'generator raised StopIteration':
+            if str(e) != "generator raised StopIteration":
                 raise e
         return result
 
@@ -103,18 +103,18 @@ class Hdfs(BaseDatabase):
         format: str = None,
     ) -> Optional[int]:
         parameters = self._get_parameters_from_ddl(table_name)
-        path = parameters['source'] + '/dt=' + str(date)
+        path = parameters["source"] + "/dt=" + str(date)
         self.mkdir(path)
-        filename = parameters.get('filename') or table_name
+        filename = parameters.get("filename") or table_name
         return self.put(path, filename, data, format)
 
     def mkdir(self, path: str) -> int:
-        command = ['hdfs', 'dfs', '-mkdir', path]
+        command = ["hdfs", "dfs", "-mkdir", path]
         returncode = subprocess.run(command).returncode
         if returncode:
-            print(f'Failed to make a directory {path}')
+            print(f"Failed to make a directory {path}")
         else:
-            print(f'Success to make a directory {path}')
+            print(f"Success to make a directory {path}")
         return returncode
 
     def put(
@@ -125,23 +125,23 @@ class Hdfs(BaseDatabase):
         format: str = None,
     ) -> int:
         if isinstance(data, str):
-            data = data.encode('utf-8')
+            data = data.encode("utf-8")
         tmp_file = NamedTemporaryFile()
         tmp_file.file.write(data)
         tmp_file.file.seek(0)
-        format = format or 'csv'
-        fullpath = path + '/' + filename + '.' + format.lower()
-        command = ['hdfs', 'dfs', '-put', tmp_file.name, fullpath]
+        format = format or "csv"
+        fullpath = path + "/" + filename + "." + format.lower()
+        command = ["hdfs", "dfs", "-put", tmp_file.name, fullpath]
         returncode = subprocess.run(command).returncode
         if returncode:
-            raise Exception(f'Something gone wrong while putting file to {fullpath}')
+            raise Exception(f"Something gone wrong while putting file to {fullpath}")
         else:
             self._touch_success_file(path)
-            print(f'Successfully put file to {path}')
+            print(f"Successfully put file to {path}")
         return len(self.ls(path, return_directories=True))
 
     def _touch_success_file(self, path: str) -> None:
-        command = ['hdfs', 'dfs', '-touchz', path + '/_SUCCESS']
+        command = ["hdfs", "dfs", "-touchz", path + "/_SUCCESS"]
         returncode = subprocess.run(command).returncode
         if returncode:
-            raise Exception(f'Something gone wrong while putting file to {path}')
+            raise Exception(f"Something gone wrong while putting file to {path}")

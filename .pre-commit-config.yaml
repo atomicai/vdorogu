@@ -26,3 +26,4 @@ repos:
     hooks:
       - id: autoflake
         additional_dependencies: [flake8-isort]
+        args: ['--remove-all-unused-imports', '--remove-unused-variable']

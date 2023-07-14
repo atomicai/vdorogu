@@ -11,15 +11,15 @@ from .spark import Spark
 
 class Database(BaseDatabase):
     DATABASES = {
-        'ch': (Clickhouse, None),
-        'hdfs': (Hdfs, None),
-        'mysql': (Mysql, None),
-        'pg': (Postgres, None),
-        'presto': (Presto, None),
-        'spark': (Spark, None),
-        'ch_proxy': (Clickhouse, 'vketl'),
-        'cx_hub': (Clickhouse, 'cx_hub'),
-        'events': (Clickhouse, 'events'),
+        "ch": (Clickhouse, None),
+        "hdfs": (Hdfs, None),
+        "mysql": (Mysql, None),
+        "pg": (Postgres, None),
+        "presto": (Presto, None),
+        "spark": (Spark, None),
+        "ch_proxy": (Clickhouse, "vketl"),
+        "cx_hub": (Clickhouse, "cx_hub"),
+        "events": (Clickhouse, "events"),
     }
 
     def __new__(cls, db_class: str, db: Optional[str] = None, *args: Any, **kwargs: Any) -> BaseDatabase:  # type: ignore

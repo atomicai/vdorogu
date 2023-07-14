@@ -13,9 +13,9 @@ from ... import tokens
 from ...sender import MyteamBot
 
 ENABLE_MOCKING = True
-DEFAULT_KEYS_PATH = Path(__file__).parent.parent.parent / '__tokens__'
-TEST_AUTHOR = 'd.kulemin'
-TEST_RECEIVER = getpass.getuser() + '@corp.mail.ru'
+DEFAULT_KEYS_PATH = Path(__file__).parent.parent.parent / "__tokens__"
+TEST_AUTHOR = "d.kulemin"
+TEST_RECEIVER = getpass.getuser() + "@corp.mail.ru"
 
 
 class BotObject:
@@ -26,7 +26,7 @@ class BotObject:
 
 
 BOTS = [
-    BotObject('normal_bot', None, True),
+    BotObject("normal_bot", None, True),
 ]
 
 
@@ -39,9 +39,9 @@ def etalon_bot(request: SubRequest) -> BotObject:
     return request.param
 
 
-@pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason='can not guarantee that token path exists')
+@pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason="can not guarantee that token path exists")
 def test_token_path_exists() -> None:
-    assert DEFAULT_KEYS_PATH.exists(), 'there are should be a path to token files'
+    assert DEFAULT_KEYS_PATH.exists(), "there are should be a path to token files"
 
 
 def test_import() -> None:
@@ -49,43 +49,43 @@ def test_import() -> None:
     from lib.trgetl.sender import __all__  # noqa: F401
 
 
-@pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason='can not guarantee that token path exists')
+@pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason="can not guarantee that token path exists")
 def test_myteambot_initialization(etalon_bot: BotObject) -> None:
     bot = MyteamBot(etalon_bot.token)
-    assert bot.token == etalon_bot.token or tokens.MYTEAMBOT_TOKEN, f'token should not be None, but got {bot.token}'
+    assert bot.token == etalon_bot.token or tokens.MYTEAMBOT_TOKEN, f"token should not be None, but got {bot.token}"
 
 
-@pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason='can not guarantee that token path exists')
+@pytest.mark.skipif(getpass.getuser() != TEST_AUTHOR, reason="can not guarantee that token path exists")
 @pytest.mark.parametrize(
-    'content, receivers, attach_name, markup',
+    "content, receivers, attach_name, markup",
     [
-        pytest.param('simple message', TEST_RECEIVER, None, None, id='simple_message'),
+        pytest.param("simple message", TEST_RECEIVER, None, None, id="simple_message"),
         pytest.param(
-            'simple message to multiple receivers', [TEST_RECEIVER, TEST_RECEIVER], None, None, id='multiple_receivers'
+            "simple message to multiple receivers", [TEST_RECEIVER, TEST_RECEIVER], None, None, id="multiple_receivers"
         ),
-        pytest.param('', TEST_RECEIVER, 'attachment.png', None, id='only_one_attachment_raises'),
+        pytest.param("", TEST_RECEIVER, "attachment.png", None, id="only_one_attachment_raises"),
         pytest.param(
-            '', [TEST_RECEIVER, TEST_RECEIVER], 'attachment.png', None, id='multiple_receivers_attachment_raises'
+            "", [TEST_RECEIVER, TEST_RECEIVER], "attachment.png", None, id="multiple_receivers_attachment_raises"
         ),
         pytest.param(
-            'message and attachment_raises', TEST_RECEIVER, 'attachment.png', None, id='message_and_attachment_raises'
+            "message and attachment_raises", TEST_RECEIVER, "attachment.png", None, id="message_and_attachment_raises"
         ),
-        pytest.param('', TEST_RECEIVER, ['attachment.png'], None, id='only_one_attachment'),
-        pytest.param('', [TEST_RECEIVER, TEST_RECEIVER], ['attachment.png'], None, id='multiple_receivers_attachment'),
-        pytest.param('message and attachment', TEST_RECEIVER, ['attachment.png'], None, id='message_and_attachment'),
+        pytest.param("", TEST_RECEIVER, ["attachment.png"], None, id="only_one_attachment"),
+        pytest.param("", [TEST_RECEIVER, TEST_RECEIVER], ["attachment.png"], None, id="multiple_receivers_attachment"),
+        pytest.param("message and attachment", TEST_RECEIVER, ["attachment.png"], None, id="message_and_attachment"),
         pytest.param(
-            'message and multiple attachments',
+            "message and multiple attachments",
             TEST_RECEIVER,
-            ['attach1.png', 'attach2.png'],
+            ["attach1.png", "attach2.png"],
             None,
-            id='message_and_multiple_attachment',
+            id="message_and_multiple_attachment",
         ),
         pytest.param(
-            'message and multiple attachments to multiple receivers',
+            "message and multiple attachments to multiple receivers",
             [TEST_RECEIVER, TEST_RECEIVER],
-            ['attach1.png', 'attach2.png'],
+            ["attach1.png", "attach2.png"],
             None,
-            id='message_and_multiple_attachment_to_multiple_receivers',
+            id="message_and_multiple_attachment_to_multiple_receivers",
         ),
     ],
 )
@@ -109,20 +109,20 @@ def test_send(
 
     def actual_send(bot: MyteamBot, kwargs: dict) -> None:
         if ENABLE_MOCKING:
-            with patch('requests.post', autospec=True) as mock_post:
+            with patch("requests.post", autospec=True) as mock_post:
                 bot.send(
-                    kwargs['content'],
-                    kwargs['receivers'],
-                    attachments=kwargs['attachments'],
-                    markup=kwargs['markup'],
+                    kwargs["content"],
+                    kwargs["receivers"],
+                    attachments=kwargs["attachments"],
+                    markup=kwargs["markup"],
                 )
                 mock_post.assert_called()
         else:
             bot.send(
-                kwargs['content'],
-                kwargs['receivers'],
-                attachments=kwargs['attachments'],
-                markup=kwargs['markup'],
+                kwargs["content"],
+                kwargs["receivers"],
+                attachments=kwargs["attachments"],
+                markup=kwargs["markup"],
             )
 
     bot = MyteamBot(etalon_bot.token)

@@ -8,20 +8,20 @@ from .transform_table import TransformTable
 
 class Table(DailyTable):
     TABLES = {
-        'custom': CustomTable,
-        'dump': DumpTable,
-        'dump-full': DumpTable,
-        'transform': TransformTable,
-        'transform-full': TransformTable,
-        'sensor': Sensor,
+        "custom": CustomTable,
+        "dump": DumpTable,
+        "dump-full": DumpTable,
+        "transform": TransformTable,
+        "transform-full": TransformTable,
+        "sensor": Sensor,
     }
 
     TABLE_TYPE_DESCRIPTIONS = {
-        'custom': 'Таблица со специальным запросом (заливка ежедневная)',
-        'dump': 'Дамп таблицы с данными по дням (заливка ежедневная)',
-        'dump-full': 'Полный дамп таблицы (заливка ежедневная, старые данные затираются)',
-        'transform': 'Трансформация с данными по дням (заливка ежедневная)',
-        'transform-full': 'Полная трансформация (заливка ежедневная, старые данные затираются)',
+        "custom": "Таблица со специальным запросом (заливка ежедневная)",
+        "dump": "Дамп таблицы с данными по дням (заливка ежедневная)",
+        "dump-full": "Полный дамп таблицы (заливка ежедневная, старые данные затираются)",
+        "transform": "Трансформация с данными по дням (заливка ежедневная)",
+        "transform-full": "Полная трансформация (заливка ежедневная, старые данные затираются)",
     }
 
     def __new__(cls, name):

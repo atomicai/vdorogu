@@ -208,17 +208,17 @@ def evaluate(
     # Stylize layout
     fig.update_layout(
         template="simple_white",
-        title={'text': f"{title}", 'x': 0.5, 'xanchor': 'center', 'yanchor': 'top', 'font': dict(size=22, color="Black")},
+        title={"text": f"{title}", "x": 0.5, "xanchor": "center", "yanchor": "top", "font": dict(size=22, color="Black")},
         width=width,
         height=height,
     )
 
-    fig.update_traces(textposition='top center')
+    fig.update_traces(textposition="top center")
 
     # fig.update_layout(
     #     title_text='Распределение по топикам и TOP_3 соответствующих класса (по частоте) на каждый топик '
     # )
-    fig.update_layout(uniformtext_minsize=12, uniformtext_mode='hide')
+    fig.update_layout(uniformtext_minsize=12, uniformtext_mode="hide")
 
     fig.update_xaxes(visible=False)
     fig.update_yaxes(visible=False)

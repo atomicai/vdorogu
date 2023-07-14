@@ -3,7 +3,7 @@ from .confluence import Confluence
 
 class Documentation:
     CH_AUTODOC_PAGE = 697262719
-    SCHEMA_PREFIX = 'Схема '
+    SCHEMA_PREFIX = "Схема "
 
     def __init__(self, confluence_client: Confluence = None):
         if confluence_client is None:
@@ -22,7 +22,7 @@ class Documentation:
 
     def all_schemas(self, return_ids=False):
         schemas = self.confluence.get_children(page_id=self.CH_AUTODOC_PAGE)
-        schemas = [(page_id, schema_name.replace(self.SCHEMA_PREFIX, '')) for page_id, schema_name in schemas]
+        schemas = [(page_id, schema_name.replace(self.SCHEMA_PREFIX, "")) for page_id, schema_name in schemas]
         if not return_ids:
             schemas = [schema_name for page_id, schema_name in schemas]
         return set(schemas)
@@ -32,7 +32,7 @@ class Documentation:
 
     def get_schema_pageid(self, schema):
         if schema not in self.all_schemas():
-            raise DocumentationError(f'schema {schema} not in documentation')
+            raise DocumentationError(f"schema {schema} not in documentation")
         schema_title = self.SCHEMA_PREFIX + schema
         return self.confluence.find(schema_title)
 

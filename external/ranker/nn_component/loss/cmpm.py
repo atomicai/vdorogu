@@ -100,7 +100,7 @@ def compute_cmpc_loss(W, image_embeddings, text_embeddings, labels):
     :param labels: Tensor with dtype torch.int32
     :return:
     """
-    criterion = nn.CrossEntropyLoss(reduction='mean')
+    criterion = nn.CrossEntropyLoss(reduction="mean")
     W_norm = W / W.norm(dim=0)
 
     image_norm = image_embeddings / image_embeddings.norm(dim=1, keepdim=True)
@@ -143,25 +143,25 @@ class CMPMLoss(nn.Module):
         result = {
             m: 0.0
             for m in [
-                'loss',
-                'cmpm',
-                'cmpc',
-                'image_precision',
-                'text_precision',
-                'negative_similarity',
-                'position_similarity',
+                "loss",
+                "cmpm",
+                "cmpc",
+                "image_precision",
+                "text_precision",
+                "negative_similarity",
+                "position_similarity",
             ]
         }
 
         if self.CMPM:
-            result['cmpm'], result['positive_similarity'], result['negative_similarity'] = compute_cmpm_loss(
+            result["cmpm"], result["positive_similarity"], result["negative_similarity"] = compute_cmpm_loss(
                 image_embeddings, text_embeddings, labels
             )
 
         if self.CMPC:
-            result['cmpc'], result['image_precision'], result['text_precision'] = compute_cmpc_loss(
+            result["cmpc"], result["image_precision"], result["text_precision"] = compute_cmpc_loss(
                 self.W, image_embeddings, text_embeddings, labels
             )
 
-        result['loss'] = result['cmpm'] + result['cmpc']
+        result["loss"] = result["cmpm"] + result["cmpc"]
         return result
