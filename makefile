@@ -11,21 +11,17 @@ export FLASK_APP=vdorogu.tdk.rise
 install:
 	pip install -e '.[all]'
 
-setup-pre-commit:
-	pip install -q pre-commit
+init:
+	pip install pre-commit==3.3.3
+	pre-commit clean
 	pre-commit install
   	# To check whole pipeline.
-	pre-commit run --all-files
+	# pre-commit run --all-files
+
 
 format:
-	isort ${ISORT_FLAGS} --check-only --diff ${NAME} external vkai test
-	black ${BLACK_FLAGS} --check --diff ${NAME} external vkai test
-	autoflake ${FLAKE_FLAGS} --in-place ${NAME} external vkai test
-
-format-fix:
-	isort ${ISORT_FLAGS} ${NAME} external vkai test
-	black ${BLACK_FLAGS} ${NAME} external vkai test
-	autoflake ${FLAKE_FLAGS} ${NAME} external vkai test
+	isort ${NAME} external test
+	black ${NAME} external test
 
 run:
 	flask run --host=0.0.0.0 --port=7777
