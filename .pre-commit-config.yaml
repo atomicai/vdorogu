@@ -21,9 +21,17 @@ repos:
     hooks:
       - id: isort
 
-  - repo: https://github.com/PyCQA/autoflake
-    rev: v2.2.0
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.0.0
     hooks:
-      - id: autoflake
-        additional_dependencies: [flake8-isort]
-        args: ['--remove-all-unused-imports', '--remove-unused-variable']
+      - id: flake8
+        additional_dependencies: [
+            'flake8-blind-except',
+            'flake8-docstrings',
+            'flake8-bugbear',
+            'flake8-comprehensions',
+            'flake8-docstrings',
+            'flake8-implicit-str-concat',
+            'pydocstyle>=5.0.0',
+        ]
+        args: ['--in-place', '--remove-all-unused-imports', '--remove-unused-variable']
