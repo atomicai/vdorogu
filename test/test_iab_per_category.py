@@ -1,13 +1,8 @@
 import unittest
 from pathlib import Path
 
-import networkx as nx
 import polars as pl
-import pyarrow as pa
 import pyarrow.parquet as pq
-import pygraphviz as pgv
-import pylab as plt
-from networkx.drawing.nx_agraph import graphviz_layout, to_agraph
 
 
 def _pl_project(db, plane, on: str, how: str = "inner"):
@@ -61,18 +56,19 @@ def _pl_unique(db, column_name):
     return projected
 
 
-def view(xs, ys, using: str = "bar"):
+def view(xs, ys, using: str = "bar", title: str = "Y"):
     import plotly.express as px
 
     if using == "bar":
         fig = px.bar(x=xs, y=ys)
     else:
         fig = px.line(x=xs, y=ys)
-    fig.update_layout(title=dict(text=title, font=dict(size=14), automargin=False, yref='paper'), xaxis={'type': 'category'})
+    fig.update_layout(
+        title=dict(text=title, font=dict(size=14), automargin=False, yref="paper"), xaxis={"type": "category"}
+    )
     fig.update_layout(yaxis_title=None)
     fig.update_layout(xaxis_title=None)
     fig.update_xaxes(tickfont_size=9, ticks="outside", ticklen=0.5, tickwidth=1)
-    fig.update_xaxes(tick)
     return fig
 
 
@@ -110,6 +106,8 @@ class ITest(unittest.TestCase):
         assert (
             len(set(df_meta_iab_ios["category_id"]) & set(df_meta_iab_droid["category_id"])) == 0
         ), "None empty intersection can cause problem(s)"
+        df_meta_iab_droid = _pl_unique(df_meta_iab_droid, column_name="category_id")
+        df_meta_iab_ios = _pl_unique(df_meta_iab_ios, column_name="category_id")  # 59 -> 58
         # <->|<->|<->
         db_droid = _pl_project(df, df_meta_iab_droid, on="category_id")
         db_ios = _pl_project(df, df_meta_iab_ios, on="category_id")
@@ -117,15 +115,23 @@ class ITest(unittest.TestCase):
         de = _pl_normalize(df, column_name="title")
         # Отдельно по источнику / магазину
         de_droid = (
-            de.filter(pl.col("source") == "google").select(["title", "category_id"]).join(df_meta_iab_droid, on="category_id")
+            de.filter(pl.col("source") == "google")
+            .select(["title", "category_id"])
+            .join(df_meta_iab_droid, on="category_id")
         )
-        de_ios = de.filter(pl.col("source") == "apple").select(["title", "category_id"]).join(df_meta_iab_ios, on="category_id")
+        de_ios = (
+            de.filter(pl.col("source") == "apple")
+            .select(["title", "category_id"])
+            .join(df_meta_iab_ios, on="category_id")
+        )
         print("IO is ok")
         # Посмотрим на кол-во общих приложений,
         # Кол-во совпадений категорий среди них и насколько все плохо
         db_proj = de_droid.join(de_ios, how="outer", on="title").with_columns(
             [
-                (pl.col("iab_category_name").is_not_null() & pl.col("iab_category_name_right").is_not_null()).alias("common"),
+                (pl.col("iab_category_name").is_not_null() & pl.col("iab_category_name_right").is_not_null()).alias(
+                    "common"
+                ),
                 (pl.col("iab_category_name").is_not_null() & pl.col("iab_category_name_right").is_null()).alias("droid"),
                 (pl.col("iab_category_name").is_null() & pl.col("iab_category_name_right").is_not_null()).alias("ios"),
             ]
@@ -136,11 +142,13 @@ class ITest(unittest.TestCase):
         # сколько общих.
         metrica["all"] = len(de)
         metrica["common_title"] = db_proj_common.shape[0]
-        metrica["common_title_iab"] = _pl_match(db_proj_common, col_x="iab_category_name", col_y="iab_category_name_right")
+        metrica["common_title_iab"] = _pl_match(
+            db_proj_common, col_x="iab_category_name", col_y="iab_category_name_right"
+        )
         metrica["variance"] = None
         # Считаем разброс по категориям (среди общих)
         print()
 
 
 if __name__ == "__main__":
-    unittest.main(argv=['first-arg-is-ignored'], exit=False)
+    unittest.main(argv=["first-arg-is-ignored"], exit=False)

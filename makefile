@@ -1,12 +1,10 @@
-LINE_WIDTH=122
 NAME := $(shell python setup.py --name)
 UNAME := $(shell uname -s)
-ISORT_FLAGS=--line-width=${LINE_WIDTH} --profile black
-FLAKE_FLAGS=--remove-unused-variables --ignore-init-module-imports --recursive
+
+# FLAKE_FLAGS=--remove-unused-variables --ignore-init-module-imports --recursive
 # "" is for multi-lang strings (comments, logs), '' is for everything else.
-BLACK_FLAGS=--skip-string-normalization --line-length=${LINE_WIDTH}
+# BLACK_FLAGS=--skip-string-normalization --line-length=${LINE_WIDTH}
 PYTEST_FLAGS=-p no:warnings
-export FLASK_APP=vdorogu.tdk.rise
 
 install:
 	pip install -e '.[all]'
@@ -20,11 +18,9 @@ init:
 
 
 format:
-	isort ${NAME} external test
-	black ${NAME} external test
+	isort external vkai test
+	black external vkai test
 
-run:
-	flask run --host=0.0.0.0 --port=7777
 
 test:
 	pytest test ${PYTEST_FLAGS} --testmon --suppress-no-test-exit-code
