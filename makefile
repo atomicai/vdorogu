@@ -1,7 +1,7 @@
 NAME := $(shell python setup.py --name)
 UNAME := $(shell uname -s)
 
-# FLAKE_FLAGS=--remove-unused-variables --ignore-init-module-imports --recursive
+FLAKE_FLAGS=--in-place --remove-all-unused-imports --remove-unused-variable --recursive
 # "" is for multi-lang strings (comments, logs), '' is for everything else.
 # BLACK_FLAGS=--skip-string-normalization --line-length=${LINE_WIDTH}
 PYTEST_FLAGS=-p no:warnings
@@ -18,9 +18,9 @@ init:
 
 
 format:
-	isort external vkai test
 	black external vkai test
-
+	isort external vkai test
+	autoflake ${FLAKE_FLAGS} external vkai test
 
 test:
 	pytest test ${PYTEST_FLAGS} --testmon --suppress-no-test-exit-code
