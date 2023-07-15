@@ -11,6 +11,9 @@ install:
 
 init:
 	pip install pre-commit==3.3.3
+	pip install isort==5.12.0
+	pip install black==23.7.0
+	pip install autoflake==2.2.0
 	pre-commit clean
 	pre-commit install
   	# To check whole pipeline.
