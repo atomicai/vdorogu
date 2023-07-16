@@ -1,4 +1,4 @@
-from typing import List
+from typing import Iterable, List
 
 import polars as pl
 
@@ -20,6 +20,39 @@ def _pl_count(db: pl.DataFrame, column_name: str = "description"):
         .filter(pl.col("mask") == pl.col("row_nr"))
         .sort(f"counts_per_{column_name}", descending=True)
     ).drop(["row_nr"])
+    return projected
+
+
+def _pl_stopwords(
+    db: pl.DataFrame,
+    column_name: str,
+    stopwords: Iterable[str],
+    min_chars_per_word: int = 2,
+    min_chars_per_sentence: int = 5,
+):
+    stopwords = set(stopwords)
+    projected = (
+        db.with_row_count()
+        .with_columns(
+            [
+                pl.col(column_name)
+                .str.split(" ")
+                .arr.eval(
+                    pl.when((~pl.element().is_in(stopwords)) & (pl.element().str.n_chars() > min_chars_per_word))
+                    .then(pl.element())
+                    .otherwise(pl.lit(""))
+                )
+                .alias(f"silo_{column_name}")
+            ]
+        )
+        .with_columns(
+            [
+                (pl.col(f"silo_{column_name}").arr.join(" ").str.n_chars() > min_chars_per_sentence).alias(
+                    f"_is_silo_{column_name}"
+                )
+            ]
+        )
+    )
     return projected
 
 
@@ -64,4 +97,13 @@ def _pl_contains(_df, col, words: List[str], cased: bool = False):
     return _df, _cnt
 
 
-__all__ = ["_pl_project", "_pl_count", "_pl_as_dict", "_pl_normalize", "_pl_match", "_pl_unique", "_pl_contains"]
+__all__ = [
+    "_pl_project",
+    "_pl_count",
+    "_pl_as_dict",
+    "_pl_stopwords",
+    "_pl_normalize",
+    "_pl_match",
+    "_pl_unique",
+    "_pl_contains",
+]
